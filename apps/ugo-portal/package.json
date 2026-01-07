@@ -1,0 +1,39 @@
+{
+  "name": "ugo-portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "@repo/api-client": "workspace:*",
+    "@repo/design-system": "workspace:*",
+    "@repo/feature": "workspace:*",
+    "@repo/shared-ui": "workspace:*",
+    "@react-three/drei": "^10.0.0-rc.1",
+    "@react-three/fiber": "^9.0.0-alpha.8",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^6.22.0",
+    "reactflow": "^11.11.4",
+    "recharts": "^3.2.1",
+    "sonner": "^2.0.7",
+    "three": "^0.160.0",
+    "wordcloud": "^1.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.14",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/three": "^0.180.0",
+    "@types/wordcloud": "^1.2.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.0"
+  }
+}

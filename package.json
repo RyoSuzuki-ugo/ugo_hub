@@ -1,0 +1,18 @@
+{
+  "name": "ugo-hub",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter ugo-portal dev",
+    "build": "turbo run build",
+    "start": "pnpm --filter ugo-portal start",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "rm -rf apps/*/dist packages/*/dist node_modules"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "turbo": "^2.3.3"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

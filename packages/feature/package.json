@@ -1,0 +1,29 @@
+{
+  "name": "@repo/feature",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./auth/src/index.ts",
+    "./skyway": "./skyway/src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@repo/api-client": "workspace:*",
+    "@repo/shared-ui": "workspace:*",
+    "@skyway-sdk/room": "^1.15.2",
+    "skyway-js": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  }
+}
