@@ -1,5 +1,5 @@
 import { agentChatAnalyticsApi } from "../api/AgentChatAnalyticsApi";
-import type { AnalyticsRequest, AnalyticsResponse } from "../models/AgentChatAnalytics";
+import type { AnalyticsRequest, AnalyticsResponse } from "../dto/AgentChatAnalytics.dto";
 
 /**
  * エージェントチャットアナリティクスサービス

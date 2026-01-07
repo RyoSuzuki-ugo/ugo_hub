@@ -1,5 +1,5 @@
 import apiClient from "../config/client";
-import { RobotWithRelations } from "../models/Robot";
+import { RobotWithRelations } from "../dto/Robot.dto";
 
 export class RobotApi {
   private readonly basePath = "/robots";

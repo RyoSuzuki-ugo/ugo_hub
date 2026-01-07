@@ -2,7 +2,7 @@ import agentClient from "../config/agentClient";
 import type {
   AnalyticsRequest,
   AnalyticsResponse,
-} from "../models/AgentChatAnalytics";
+} from "../dto/AgentChatAnalytics.dto";
 
 /**
  * エージェントチャットアナリティクスAPI クライアント

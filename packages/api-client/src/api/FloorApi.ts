@@ -1,5 +1,5 @@
 import apiClient from "../config/client";
-import { FloorWithRelations } from "../models/Floor";
+import { FloorWithRelations } from "../dto/Floor.dto";
 
 export class FloorApi {
   private readonly basePath = "/floors";

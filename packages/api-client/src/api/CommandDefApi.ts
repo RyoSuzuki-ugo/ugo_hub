@@ -1,5 +1,5 @@
 import apiClient from "../config/client";
-import type { CommandDefWithRelations } from "../models/CommandDef";
+import type { CommandDefWithRelations } from "../dto/CommandDef.dto";
 
 export class CommandDefApi {
   private readonly basePath = "/command-defs";

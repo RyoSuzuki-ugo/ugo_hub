@@ -1,8 +1,8 @@
 import apiClient from "../config/client";
-import { BuildingWithRelations } from "../models/Building";
-import { CommandJson } from "../models/CommandJson";
-import { FlowGroupJson } from "../models/FlowGroupJson";
-import { Floor } from "../models/Floor";
+import { BuildingWithRelations } from "../dto/Building.dto";
+import { CommandJson } from "../dto/CommandJson.dto";
+import { FlowGroupJson } from "../dto/FlowGroupJson.dto";
+import { Floor } from "../dto/Floor.dto";
 
 export class BuildingApi {
   private readonly basePath = "/buildings";

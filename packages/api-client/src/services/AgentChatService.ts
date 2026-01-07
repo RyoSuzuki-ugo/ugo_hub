@@ -2,7 +2,7 @@ import agentClient from "../config/agentClient";
 import type {
   AgentPostMessageRequest,
   AgentPostMessageResponse,
-} from "../models/AgentChat";
+} from "../dto/AgentChat.dto";
 
 type AgentPostMessageEnvelope =
   | AgentPostMessageResponse

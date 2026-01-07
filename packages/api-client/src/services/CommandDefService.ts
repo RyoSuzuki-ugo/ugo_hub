@@ -1,5 +1,5 @@
 import { commandDefApi } from "../api/CommandDefApi";
-import type { CommandDefWithRelations } from "../models/CommandDef";
+import type { CommandDefWithRelations } from "../dto/CommandDef.dto";
 
 export class CommandDefService {
   /**

@@ -1,5 +1,5 @@
 import { robotApi } from "../api/RobotApi";
-import { RobotWithRelations } from "../models/Robot";
+import { RobotWithRelations } from "../dto/Robot.dto";
 
 export class RobotService {
   async findBySerialNo(

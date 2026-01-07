@@ -13,7 +13,7 @@ export type {
   Operator,
   OperatorRelations,
   OperatorWithRelations,
-} from "./models/Operator";
+} from "./dto/Operator.dto";
 export type {
   FindRobotBySerialNoRequest,
   Group,
@@ -21,7 +21,7 @@ export type {
   Robot,
   RobotRelations,
   RobotWithRelations,
-} from "./models/Robot";
+} from "./dto/Robot.dto";
 export type {
   Building,
   BuildingRelations,
@@ -29,36 +29,36 @@ export type {
   FlowGroup,
   FlowItem,
   FlowSequence,
-} from "./models/Building";
+} from "./dto/Building.dto";
 export type {
   Floor,
   FloorRelations,
   FloorWithRelations,
   Map,
-} from "./models/Floor";
-export type { Organization } from "./models/Organization";
-export type { CommandJson } from "./models/CommandJson";
-export { CommandMode, CommandStatus } from "./models/CommandJson";
-export type { FlowJson } from "./models/FlowJson";
-export type { FlowGroupJson } from "./models/FlowGroupJson";
+} from "./dto/Floor.dto";
+export type { Organization } from "./dto/Organization.dto";
+export type { CommandJson } from "./dto/CommandJson.dto";
+export { CommandMode, CommandStatus } from "./dto/CommandJson.dto";
+export type { FlowJson } from "./dto/FlowJson.dto";
+export type { FlowGroupJson } from "./dto/FlowGroupJson.dto";
 export type {
   CommandDef,
   CommandDefRelations,
   CommandDefWithRelations,
-} from "./models/CommandDef";
-export { CommandType } from "./models/CommandDef";
+} from "./dto/CommandDef.dto";
+export { CommandType } from "./dto/CommandDef.dto";
 export type {
   AgentLocationPayload,
   AgentPostMessageRequest,
   AgentPostMessageResponse,
-} from "./models/AgentChat";
+} from "./dto/AgentChat.dto";
 export type {
   AnalyticsRequest,
   AnalyticsResponse,
   AnalyticsData,
   WordToken,
   WordStats,
-} from "./models/AgentChatAnalytics";
+} from "./dto/AgentChatAnalytics.dto";
 
 // Services
 export { operatorService } from "./services/OperatorService";

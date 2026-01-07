@@ -1,8 +1,8 @@
 import { buildingApi } from "../api/BuildingApi";
-import { BuildingWithRelations } from "../models/Building";
-import { CommandJson, CommandMode } from "../models/CommandJson";
-import { FlowGroupJson } from "../models/FlowGroupJson";
-import { Floor } from "../models/Floor";
+import { BuildingWithRelations } from "../dto/Building.dto";
+import { CommandJson, CommandMode } from "../dto/CommandJson.dto";
+import { FlowGroupJson } from "../dto/FlowGroupJson.dto";
+import { Floor } from "../dto/Floor.dto";
 
 export class BuildingService {
   async findById(id: string): Promise<BuildingWithRelations> {

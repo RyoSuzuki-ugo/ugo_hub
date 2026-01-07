@@ -1,5 +1,5 @@
 import apiClient from "../config/client";
-import { LoginRequest, LoginResponse } from "../models/Operator";
+import { LoginRequest, LoginResponse } from "../dto/Operator.dto";
 
 export class OperatorApi {
   private readonly basePath = "/operators";

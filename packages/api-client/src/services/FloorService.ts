@@ -1,5 +1,5 @@
 import { floorApi } from "../api/FloorApi";
-import { FloorWithRelations } from "../models/Floor";
+import { FloorWithRelations } from "../dto/Floor.dto";
 
 export class FloorService {
   async findById(id: string): Promise<FloorWithRelations> {
