@@ -10,12 +10,13 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@react-three/drei": "^10.0.0-rc.1",
+    "@react-three/fiber": "^9.0.0-alpha.8",
     "@repo/api-client": "workspace:*",
     "@repo/design-system": "workspace:*",
     "@repo/feature": "workspace:*",
     "@repo/shared-ui": "workspace:*",
-    "@react-three/drei": "^10.0.0-rc.1",
-    "@react-three/fiber": "^9.0.0-alpha.8",
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^6.22.0",
@@ -26,13 +27,14 @@
     "wordcloud": "^1.2.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.14",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@types/three": "^0.180.0",
     "@types/wordcloud": "^1.2.2",
     "@vitejs/plugin-react": "^4.2.1",
-    "tailwindcss": "^4.1.14",
+    "autoprefixer": "10",
+    "postcss": "8",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
     "vite": "^5.1.0"
   }

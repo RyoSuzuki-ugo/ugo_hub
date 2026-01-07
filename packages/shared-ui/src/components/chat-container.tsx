@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { cn } from "../../lib/utils.ts";
+import { cn } from "../lib/utils";
 
 interface ChatContainerProps {
   children: React.ReactNode;

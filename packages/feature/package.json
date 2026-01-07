@@ -5,8 +5,8 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./auth": "./auth/src/index.ts",
-    "./skyway": "./skyway/src/index.ts"
+    "./auth": "./auth/index.ts",
+    "./skyway": "./skyway/index.ts"
   },
   "scripts": {
     "lint": "eslint ."
@@ -24,6 +24,7 @@
   },
   "peerDependencies": {
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
+    "react-dom": ">=18.0.0",
+    "react-router-dom": ">=6.0.0"
   }
 }

@@ -1,4 +1,4 @@
-import { cn } from "../../lib/utils.ts";
+import { cn } from "../lib/utils";
 import { Bot, User } from "lucide-react";
 import { Button } from "./button";
 

@@ -1,5 +1,5 @@
 import React, { KeyboardEvent, useState } from "react";
-import { cn } from "../../lib/utils.ts";
+import { cn } from "../lib/utils";
 import { Button } from "./button.tsx";
 import { Loader2, Send } from "lucide-react";
 

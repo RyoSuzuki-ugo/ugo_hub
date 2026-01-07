@@ -1,3 +1,3 @@
 // Main feature package exports
-export * from '../auth/src';
-export * from '../skyway/src';
+export * from '../auth';
+export * from '../skyway';

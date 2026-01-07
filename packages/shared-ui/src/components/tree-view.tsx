@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { cn } from "../../lib/utils.ts";
+import { cn } from "../lib/utils";
 import {
   SidebarGroup,
   SidebarGroupContent,

@@ -1,6 +1,3 @@
-// CSS のエクスポート
-import "./styles/globals.css";
-
 // コンポーネントのエクスポート
 export { default as LoginForm } from "./components/LoginForm";
 export { default as LoginPage } from "./components/LoginPage";
