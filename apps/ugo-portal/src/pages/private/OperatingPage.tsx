@@ -1,11 +1,52 @@
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
+import { Button } from "@repo/shared-ui/components/button";
+import { ArrowLeft } from "lucide-react";
+import { SkywayRoom } from "@repo/feature";
 
 export function OperatingPage() {
+  const navigate = useNavigate();
+  const serialNo = "UM01AA-A294X0006";
+
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8">オペレーティング</h1>
-      <p className="text-muted-foreground mb-6">ロボットの操作と監視を行います</p>
+      <div className="flex items-center gap-4 mb-8">
+        <Button variant="outline" size="icon" onClick={() => navigate("/dashboard")}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold">オペレーティング</h1>
+          <p className="text-muted-foreground">ロボットの操作と監視を行います</p>
+        </div>
+      </div>
 
+      {/* ロボットカード */}
+      <div className="mb-8">
+        <Card>
+          <CardHeader className="bg-gray-800 text-white">
+            <CardTitle>{serialNo}</CardTitle>
+            <CardDescription className="text-gray-300">ロボット操作画面</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="h-[600px]">
+              <SkywayRoom
+                channelName={serialNo}
+                autoJoin
+                fullScreen={false}
+                showSettings={false}
+                onConnectionChange={(connected: boolean) => {
+                  console.log("SkywayRoom Connection status:", connected);
+                }}
+                onError={(error: unknown) => {
+                  console.error("SkywayRoom error:", error);
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 機能カード */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
