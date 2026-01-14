@@ -7,7 +7,7 @@ export interface LoginPageProps extends Omit<LoginFormProps, "onSuccess"> {
 }
 
 export default function LoginPage({
-  defaultReturnUrl = "/flow",
+  defaultReturnUrl = "/dashboard",
   onSuccess,
   ...loginFormProps
 }: LoginPageProps) {
