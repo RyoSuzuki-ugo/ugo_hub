@@ -19,6 +19,18 @@ export function PlanningPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/setup/initial")}>
+          <CardHeader>
+            <CardTitle>初期セットアップ</CardTitle>
+            <CardDescription>組織、ビル、フロア、グループの初期設定</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button className="w-full" onClick={(e) => { e.stopPropagation(); navigate("/setup/initial"); }}>
+              開始
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>マップエディタ</CardTitle>
