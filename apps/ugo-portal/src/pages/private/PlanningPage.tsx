@@ -31,13 +31,15 @@ export function PlanningPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/map-editor")}>
           <CardHeader>
             <CardTitle>マップエディタ</CardTitle>
             <CardDescription>マップの作成と編集</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">準備中</p>
+            <Button className="w-full" onClick={(e) => { e.stopPropagation(); navigate("/map-editor"); }}>
+              開く
+            </Button>
           </CardContent>
         </Card>
 

@@ -8,6 +8,7 @@ import { PlanningPage } from './pages/private/PlanningPage';
 import { ManagementPage } from './pages/private/ManagementPage';
 import { SystemSettingsPage } from './pages/private/SystemSettingsPage';
 import { InitialSetupPage } from './pages/private/setup/InitialSetupPage';
+import { MapEditorPage } from './pages/private/MapEditorPage';
 import { FlowPage } from './pages/private/FlowPage';
 import { TeleopePage } from './pages/private/TeleopePage';
 import { UISamplePage } from './pages/private/UISamplePage';
@@ -29,6 +30,7 @@ function App() {
         <Route path="/management" element={<ManagementPage />} />
         <Route path="/system-settings" element={<SystemSettingsPage />} />
         <Route path="/setup/initial" element={<InitialSetupPage />} />
+        <Route path="/map-editor" element={<MapEditorPage />} />
         <Route path="/flow" element={<FlowPage />} />
         <Route path="/teleope" element={<TeleopePage />} />
         <Route path="/ui-sample" element={<UISamplePage />} />
