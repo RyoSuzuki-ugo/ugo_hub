@@ -2,16 +2,16 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout } from './layouts/PublicLayout';
 import { PrivateLayout } from './layouts/PrivateLayout';
 import { LoginPage } from './pages/public/LoginPage';
-import { DashboardPage } from './pages/private/DashboardPage';
-import { OperatingPage } from './pages/private/OperatingPage';
-import { PlanningPage } from './pages/private/PlanningPage';
-import { ManagementPage } from './pages/private/ManagementPage';
-import { SystemSettingsPage } from './pages/private/SystemSettingsPage';
-import { InitialSetupPage } from './pages/private/setup/InitialSetupPage';
-import { MapEditorPage } from './pages/private/MapEditorPage';
-import { FlowPage } from './pages/private/FlowPage';
-import { TeleopePage } from './pages/private/TeleopePage';
-import { UISamplePage } from './pages/private/UISamplePage';
+import { DashboardPage } from './pages/private/dashboard/DashboardPage';
+import { OperatingPage } from './pages/private/operating/OperatingPage';
+import { PlanningPage } from './pages/private/planning/PlanningPage';
+import { ManagementPage } from './pages/private/management/ManagementPage';
+import { SystemSettingsPage } from './pages/private/system-settings/SystemSettingsPage';
+import { InitialSetupPage } from './pages/private/planning/setup/InitialSetupPage';
+import { MapEditorPage } from './pages/private/planning/map-editor/MapEditorPage';
+import { FlowPage } from './pages/private/planning/flow/FlowPage';
+import { TeleopePage } from './pages/private/operating/teleope/TeleopePage';
+import { UISamplePage } from './pages/private/ui-sample/UISamplePage';
 
 function App() {
   return (

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@repo/shared-ui/components/button";
 import { ArrowLeft } from "lucide-react";
-import { SetupStepper } from "../../../feature/setup/setup-stepper.component";
+import { SetupStepper } from "../../../../feature/setup/setup-stepper.component";
 
 export function InitialSetupPage() {
   const navigate = useNavigate();

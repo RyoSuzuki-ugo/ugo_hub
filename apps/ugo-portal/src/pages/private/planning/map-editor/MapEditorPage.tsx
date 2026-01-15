@@ -1,20 +1,21 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@repo/shared-ui/components/button";
 import { ArrowLeft } from "lucide-react";
 import { FloorMapViewer3D } from "@repo/feature";
+import { MapEditorProvider, useMapEditor } from "./_contexts/MapEditorContext";
 
-export function MapEditorPage() {
+function MapEditorContent() {
   const navigate = useNavigate();
-  const [showRobot, setShowRobot] = useState(false);
-
-  // サンプルデータ（実際にはAPIから取得）
-  const sampleMapUrl = null; // 後でマップ画像URLを設定
-  const sampleRobotPosition = {
-    x: 0,
-    y: 0,
-    r: 0,
-  };
+  const {
+    mapImageUrl,
+    showRobot,
+    setShowRobot,
+    robotPosition,
+    mapRealSize,
+    cameraZoom,
+    followMode,
+    setFollowMode,
+  } = useMapEditor();
 
   return (
     <div className="w-full h-screen flex flex-col">
@@ -29,8 +30,21 @@ export function MapEditorPage() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* 左サイドバー - ツールとレイヤー */}
-        <div className="w-64 border-r p-4 overflow-y-auto">
+        {/* メインキャンバス - 3D地図 */}
+        <div className="flex-1">
+          <FloorMapViewer3D
+            imageUrl={mapImageUrl}
+            showRobot={showRobot}
+            robotPosition={showRobot ? robotPosition : null}
+            initialZoom={cameraZoom}
+            mapRealSize={mapRealSize}
+            followMode={followMode}
+            onFollowModeChange={setFollowMode}
+          />
+        </div>
+
+        {/* 右サイドバー - ツールとレイヤー */}
+        <div className="w-[512px] border-l p-4 overflow-y-auto">
           <div className="space-y-4">
             <div>
               <h3 className="font-semibold mb-2">ツール</h3>
@@ -68,18 +82,15 @@ export function MapEditorPage() {
             </div>
           </div>
         </div>
-
-        {/* メインキャンバス - 3D地図 */}
-        <div className="flex-1">
-          <FloorMapViewer3D
-            imageUrl={sampleMapUrl}
-            showRobot={showRobot}
-            robotPosition={showRobot ? sampleRobotPosition : null}
-            initialZoom={100}
-            mapRealSize={30}
-          />
-        </div>
       </div>
     </div>
+  );
+}
+
+export function MapEditorPage() {
+  return (
+    <MapEditorProvider>
+      <MapEditorContent />
+    </MapEditorProvider>
   );
 }
