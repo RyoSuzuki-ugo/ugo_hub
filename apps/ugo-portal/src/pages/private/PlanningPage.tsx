@@ -80,6 +80,36 @@ export function PlanningPage() {
             <p className="text-sm text-muted-foreground">準備中</p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>コマンドリスト</CardTitle>
+            <CardDescription>ロボットのコマンドを管理</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">準備中</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>閾値ルール</CardTitle>
+            <CardDescription>アラートの閾値を設定</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">準備中</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>ナレッジ管理</CardTitle>
+            <CardDescription>AI会話のナレッジベースを管理</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">準備中</p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

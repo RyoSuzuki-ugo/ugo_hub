@@ -58,6 +58,16 @@ export function ManagementPage() {
             <p className="text-sm text-muted-foreground">準備中</p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>IoTデバイス管理</CardTitle>
+            <CardDescription>IoTデバイスの登録と設定</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">準備中</p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

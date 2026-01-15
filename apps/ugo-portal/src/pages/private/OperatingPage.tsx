@@ -80,8 +80,18 @@ export function OperatingPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>ヘルスチェック</CardTitle>
-            <CardDescription>ロボットの状態を監視</CardDescription>
+            <CardTitle>警備・点検レポート</CardTitle>
+            <CardDescription>警備巡回と点検結果を確認</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">準備中</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>録画データ</CardTitle>
+            <CardDescription>ロボットの録画映像を管理</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">準備中</p>

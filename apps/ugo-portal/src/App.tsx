@@ -6,6 +6,7 @@ import { DashboardPage } from './pages/private/DashboardPage';
 import { OperatingPage } from './pages/private/OperatingPage';
 import { PlanningPage } from './pages/private/PlanningPage';
 import { ManagementPage } from './pages/private/ManagementPage';
+import { SystemSettingsPage } from './pages/private/SystemSettingsPage';
 import { InitialSetupPage } from './pages/private/setup/InitialSetupPage';
 import { FlowPage } from './pages/private/FlowPage';
 import { TeleopePage } from './pages/private/TeleopePage';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/operating" element={<OperatingPage />} />
         <Route path="/planning" element={<PlanningPage />} />
         <Route path="/management" element={<ManagementPage />} />
+        <Route path="/system-settings" element={<SystemSettingsPage />} />
         <Route path="/setup/initial" element={<InitialSetupPage />} />
         <Route path="/flow" element={<FlowPage />} />
         <Route path="/teleope" element={<TeleopePage />} />

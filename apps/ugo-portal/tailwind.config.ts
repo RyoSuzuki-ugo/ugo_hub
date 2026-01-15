@@ -8,5 +8,6 @@ export default {
     './src/**/*.{ts,tsx}',
     '../../packages/shared-ui/src/**/*.{ts,tsx}',
     '../../packages/design-system/src/**/*.{ts,tsx}',
+    '../../packages/feature/**/*.{ts,tsx}',
   ],
 } satisfies Config;
