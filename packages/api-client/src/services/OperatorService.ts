@@ -14,9 +14,29 @@ export class OperatorService {
     try {
       const result = await operatorApi.login(data);
 
+      console.log("Login result:", result);
+
       if (typeof window !== "undefined") {
+        console.log("Saving to localStorage...");
+
+        // トークンを保存
         localStorage.setItem("user-token", result.token);
-        localStorage.setItem("operator_data", JSON.stringify(result.operator));
+
+        // オペレータ情報を整形して保存
+        const operatorData = {
+          id: result.id,
+          name: result.lastName + result.firstName,
+          organizationId: result.organizationId,
+          buildingId: result.buildingId,
+          operatorId: result.id,
+          type: result.type,
+          labsEnabled: result.labsEnabled,
+          lastLoginAt: result.lastLoginAt,
+        };
+
+        console.log("Formatted operator data:", operatorData);
+        localStorage.setItem("operator_data", JSON.stringify(operatorData));
+        console.log("Saved to localStorage");
       }
 
       return result;
@@ -28,7 +48,8 @@ export class OperatorService {
 
   async logout(): Promise<void> {
     try {
-      await operatorApi.logout();
+      // TODO: API呼び出しを実装後に有効化
+      // await operatorApi.logout();
 
       if (typeof window !== "undefined") {
         localStorage.removeItem("user-token");

@@ -133,7 +133,7 @@ export default function AuthProvider({
 
   const logout = async () => {
     try {
-      await operatorService.logout();
+      //await operatorService.logout();
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {

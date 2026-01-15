@@ -41,9 +41,17 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  id: string;
   token: string;
-  operator: Operator;
-  expiresAt: string;
+  type: number;
+  organizationId: string;
+  buildingId: string;
+  firstName: string;
+  lastName: string;
+  labsEnabled: boolean;
+  skywayKey: string;
+  passwordChangeRequired: boolean;
+  lastLoginAt?: string;
 }
 
 export const OperatorTypes = {
