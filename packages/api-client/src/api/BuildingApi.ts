@@ -12,6 +12,20 @@ export class BuildingApi {
   }
 
   /**
+   * 組織IDに紐づくビルディング一覧を取得
+   * @param organizationId 組織ID
+   */
+  findByOrganizationId(organizationId: string): Promise<BuildingWithRelations[]> {
+    const filterQueryObj = {
+      where: {
+        organizationId: organizationId,
+      },
+    };
+    const filterQuery = encodeURIComponent(JSON.stringify(filterQueryObj));
+    return apiClient.get<BuildingWithRelations[]>(`${this.basePath}?filter=${filterQuery}`);
+  }
+
+  /**
    * ビルディングに紐づくコマンド一覧を取得
    * @param id ビルディングID
    * @param mode コマンドモード (0: デフォルト, 1: カスタム)

@@ -1,21 +1,87 @@
+import { useState } from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
+import { Input } from "@repo/shared-ui/components/input";
+import { Button } from "@repo/shared-ui/components/button";
+import { ArrowUpAZ, ArrowDownAZ, Search, LayoutGrid, List } from "lucide-react";
 import { useBuildingFloor } from "../_contexts/BuildingFloorContext";
 
+type FloorViewMode = "card" | "list";
+
 export function BuildingFloorTab() {
-  const { buildings, selectedBuilding, setSelectedBuilding, getFloorsForBuilding } = useBuildingFloor();
+  const {
+    filteredBuildings,
+    selectedBuilding,
+    setSelectedBuilding,
+    getFloorsForBuilding,
+    searchQuery,
+    setSearchQuery,
+    sortOrder,
+    setSortOrder,
+  } = useBuildingFloor();
+
+  const [showSearch, setShowSearch] = useState(false);
+  const [showFloorSearch, setShowFloorSearch] = useState(false);
+  const [floorSearchQuery, setFloorSearchQuery] = useState("");
+  const [floorSortOrder, setFloorSortOrder] = useState<"asc" | "desc">("asc");
+  const [floorViewMode, setFloorViewMode] = useState<FloorViewMode>("card");
 
   const floors = selectedBuilding ? getFloorsForBuilding(selectedBuilding.id) : [];
+
+  // フロアのフィルタリングとソート
+  const filteredFloors = floors
+    .filter((floor) =>
+      floor.name.toLowerCase().includes(floorSearchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (floorSortOrder === "asc") {
+        return a.name.localeCompare(b.name, "ja");
+      } else {
+        return b.name.localeCompare(a.name, "ja");
+      }
+    });
 
   return (
     <div className="flex gap-6 h-full">
       {/* 左側: ビル一覧 (3割) */}
       <div className="w-[30%] h-full">
         <Card className="h-full flex flex-col">
-          <CardHeader>
+          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle>ビル一覧</CardTitle>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setShowSearch(!showSearch)}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              >
+                {sortOrder === "asc" ? (
+                  <ArrowUpAZ className="h-4 w-4" />
+                ) : (
+                  <ArrowDownAZ className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </CardHeader>
-          <div className="flex-1 p-4 pt-0 space-y-2 overflow-y-auto">
-            {buildings.map((building) => (
+          {showSearch && (
+            <div className="px-4 pb-2">
+              <Input
+                type="text"
+                placeholder="ビル名で検索..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          )}
+          <div className="flex-1 px-4 pb-4 space-y-2 overflow-y-auto">
+            {filteredBuildings.map((building) => (
               <div
                 key={building.id}
                 onClick={() => setSelectedBuilding(building)}
@@ -39,20 +105,80 @@ export function BuildingFloorTab() {
           {selectedBuilding ? selectedBuilding.name : "ビルを選択してください"}
         </h2>
         <Card className="flex-1 flex flex-col">
-          <CardHeader>
+          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle>フロア一覧</CardTitle>
-          </CardHeader>
-          <div className="flex-1 p-4 pt-0 overflow-y-auto">
-            <div className="grid grid-cols-3 gap-4">
-              {floors.map((floor) => (
-                <Card key={floor.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-base">{floor.name}</CardTitle>
-                    <CardDescription className="text-xs">{floor.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setShowFloorSearch(!showFloorSearch)}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setFloorSortOrder(floorSortOrder === "asc" ? "desc" : "asc")}
+              >
+                {floorSortOrder === "asc" ? (
+                  <ArrowUpAZ className="h-4 w-4" />
+                ) : (
+                  <ArrowDownAZ className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setFloorViewMode(floorViewMode === "card" ? "list" : "card")}
+              >
+                {floorViewMode === "card" ? (
+                  <List className="h-4 w-4" />
+                ) : (
+                  <LayoutGrid className="h-4 w-4" />
+                )}
+              </Button>
             </div>
+          </CardHeader>
+          {showFloorSearch && (
+            <div className="px-4 pb-2">
+              <Input
+                type="text"
+                placeholder="フロア名で検索..."
+                value={floorSearchQuery}
+                onChange={(e) => setFloorSearchQuery(e.target.value)}
+              />
+            </div>
+          )}
+          <div className="flex-1 p-4 pt-0 overflow-y-auto">
+            {floorViewMode === "card" ? (
+              <div className="grid grid-cols-3 gap-4">
+                {filteredFloors.map((floor) => (
+                  <Card key={floor.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <CardHeader className="p-4">
+                      <CardTitle className="text-base">{floor.name}</CardTitle>
+                      <CardDescription className="text-xs">{floor.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredFloors.map((floor) => (
+                  <div
+                    key={floor.id}
+                    className="cursor-pointer p-3 rounded border hover:bg-gray-100 transition-colors flex items-center justify-between"
+                  >
+                    <div>
+                      <div className="font-medium">{floor.name}</div>
+                      <div className="text-xs text-gray-600">{floor.description}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </Card>
       </div>
