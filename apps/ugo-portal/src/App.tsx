@@ -11,7 +11,6 @@ import { InitialSetupPage } from './pages/private/planning/setup/InitialSetupPag
 import { MapEditorPage } from './pages/private/planning/map-editor/MapEditorPage';
 import { FlowPage } from './pages/private/planning/flow/FlowPage';
 import { TeleopePage } from './pages/private/operating/teleope/TeleopePage';
-import { UISamplePage } from './pages/private/ui-sample/UISamplePage';
 
 function App() {
   return (
@@ -33,7 +32,6 @@ function App() {
         <Route path="/map-editor" element={<MapEditorPage />} />
         <Route path="/flow" element={<FlowPage />} />
         <Route path="/teleope" element={<TeleopePage />} />
-        <Route path="/ui-sample" element={<UISamplePage />} />
       </Route>
     </Routes>
   );
