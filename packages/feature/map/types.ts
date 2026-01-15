@@ -66,4 +66,6 @@ export interface FloorMapViewer3DProps {
   // カメラ追従モード
   followMode?: boolean;
   onFollowModeChange?: (enabled: boolean) => void;
+  // ロボットを表示するかどうか
+  showRobot?: boolean;
 }

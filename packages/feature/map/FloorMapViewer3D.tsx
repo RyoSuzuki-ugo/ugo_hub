@@ -23,6 +23,7 @@ export function FloorMapViewer3D({
   mapRealSize = 30, // デフォルト30m x 30m
   followMode = false,
   onFollowModeChange,
+  showRobot = true,
 }: FloorMapViewer3DProps) {
   if (!imageUrl) {
     return (
@@ -97,12 +98,12 @@ export function FloorMapViewer3D({
         </Suspense>
 
         {/* ロボットの位置を表示 */}
-        {robotPosition && (
+        {showRobot && robotPosition && (
           <RobotMarker position={robotPosition} mapRealSize={mapRealSize} />
         )}
 
         {/* LiDARデータを表示 */}
-        {robotPosition && lidarData && (
+        {showRobot && robotPosition && lidarData && (
           <LidarPoints
             robotPosition={robotPosition}
             lidarData={lidarData}
