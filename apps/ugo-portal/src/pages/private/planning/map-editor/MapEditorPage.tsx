@@ -1,7 +1,22 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@repo/shared-ui/components/button";
-import { ArrowLeft } from "lucide-react";
-import { FloorMapViewer3D } from "@repo/feature";
+import { ArrowLeft, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/shared-ui/components/dropdown-menu";
+import { Canvas } from "@react-three/fiber";
+import { Suspense } from "react";
+import {
+  FloorMapPlane,
+  RobotMarker,
+  DestinationMarker,
+  MapControls,
+  MapCamera,
+  MapLighting,
+} from "@repo/feature";
 import { MapEditorProvider, useMapEditor } from "./_contexts/MapEditorContext";
 
 function MapEditorContent() {
@@ -17,6 +32,7 @@ function MapEditorContent() {
     setFollowMode,
     floor,
     loading,
+    destinations,
   } = useMapEditor();
 
   return (
@@ -36,15 +52,42 @@ function MapEditorContent() {
       <div className="flex flex-1 overflow-hidden">
         {/* メインキャンバス - 3D地図 */}
         <div className="flex-1">
-          <FloorMapViewer3D
-            imageUrl={mapImageUrl}
-            showRobot={showRobot}
-            robotPosition={showRobot ? robotPosition : null}
-            initialZoom={cameraZoom}
-            mapRealSize={mapRealSize}
-            followMode={followMode}
-            onFollowModeChange={setFollowMode}
-          />
+          <Canvas
+            orthographic
+            camera={{ position: [0, 10, 0], zoom: cameraZoom }}
+            style={{ background: "#f0f0f0" }}
+          >
+            <Suspense fallback={null}>
+              <MapLighting />
+
+              {/* フロアマップ */}
+              <FloorMapPlane imageUrl={mapImageUrl} mapRealSize={mapRealSize} />
+
+              {/* ロボットマーカー */}
+              {showRobot && robotPosition && (
+                <RobotMarker position={robotPosition} mapRealSize={mapRealSize} />
+              )}
+
+              {/* 目的地マーカー */}
+              {destinations.map((dest) => (
+                <DestinationMarker
+                  key={dest.id}
+                  x={dest.x}
+                  y={dest.y}
+                  r={dest.r}
+                  name={dest.name}
+                  mapRealSize={mapRealSize}
+                />
+              ))}
+
+              <MapControls
+                followMode={followMode}
+                followTarget={showRobot && robotPosition ? robotPosition : null}
+                mapRealSize={mapRealSize}
+              />
+              <MapCamera />
+            </Suspense>
+          </Canvas>
         </div>
 
         {/* 右サイドバー - 目的地・経路 */}
@@ -60,25 +103,41 @@ function MapEditorContent() {
               </div>
             </div>
             <div className="p-4">
-              <div className="text-center py-8 text-sm text-muted-foreground">
-                目的地が登録されていません
-              </div>
-              {/* 目的地リストのサンプル（将来的に動的に生成） */}
-              {/* <div className="space-y-2">
-                <div className="p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">目的地 1</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        座標: (15.5, 20.3)
+              {destinations.length === 0 ? (
+                <div className="text-center py-8 text-sm text-muted-foreground">
+                  目的地が登録されていません
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {destinations.map((dest) => (
+                    <div
+                      key={dest.id}
+                      className="p-3 border rounded-lg hover:bg-accent cursor-pointer"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{dest.name}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            座標: ({dest.x}, {dest.y})
+                          </div>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>コマンド設定</DropdownMenuItem>
+                            <DropdownMenuItem>削除</DropdownMenuItem>
+                            <DropdownMenuItem>テスト走行</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      ×
-                    </Button>
-                  </div>
+                  ))}
                 </div>
-              </div> */}
+              )}
             </div>
           </div>
 

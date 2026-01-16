@@ -2,6 +2,14 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import type { RobotPosition } from "@repo/feature";
 import { floorService, buildingApi, type FloorWithRelations } from "@repo/api-client";
 
+export interface Destination {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  r: number;
+}
+
 interface MapEditorContextType {
   // マップ関連
   mapImageUrl: string | null;
@@ -14,6 +22,10 @@ interface MapEditorContextType {
   setShowRobot: (show: boolean) => void;
   robotPosition: RobotPosition | null;
   setRobotPosition: (position: RobotPosition | null) => void;
+
+  // 目的地
+  destinations: Destination[];
+  setDestinations: (destinations: Destination[]) => void;
 
   // フロア情報
   floor: FloorWithRelations | null;
@@ -59,6 +71,13 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
   const [robotPosition, setRobotPosition] = useState<RobotPosition | null>(
     null
   );
+
+  // 目的地（モックデータ）
+  const [destinations, setDestinations] = useState<Destination[]>([
+    { id: "dest-1", name: "目的地 A", x: 10, y: 10, r: 0 },
+    { id: "dest-2", name: "目的地 B", x: 15, y: 8, r: Math.PI / 2 },
+    { id: "dest-3", name: "目的地 C", x: 8, y: 13, r: Math.PI },
+  ]);
 
   // フロア情報
   const [floor, setFloor] = useState<FloorWithRelations | null>(null);
@@ -131,6 +150,8 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
     setShowRobot,
     robotPosition,
     setRobotPosition,
+    destinations,
+    setDestinations,
     floor,
     loading,
     selectedBuildingId,

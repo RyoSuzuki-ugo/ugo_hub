@@ -2,6 +2,7 @@
 export { FloorMapViewer3D } from "./FloorMapViewer3D";
 export { MultiRobotMapViewer } from "./MultiRobotMapViewer";
 export { RobotMarker } from "./RobotMarker";
+export { DestinationMarker } from "./DestinationMarker";
 export { LidarPoints } from "./LidarPoints";
 export { MapControls } from "./MapControls";
 export { FloorMapPlane } from "./FloorMapPlane";
