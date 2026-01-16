@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Input } from "@repo/shared-ui/components/input";
 import { Button } from "@repo/shared-ui/components/button";
-import { ArrowUpAZ, ArrowDownAZ, Search, LayoutGrid, List } from "lucide-react";
+import { ArrowUpAZ, ArrowDownAZ, Search, LayoutGrid, List, Edit } from "lucide-react";
 import { useBuildingFloor } from "../_contexts/BuildingFloorContext";
 
 type FloorViewMode = "card" | "list";
 
 export function BuildingFloorTab() {
+  const navigate = useNavigate();
   const {
     filteredBuildings,
     selectedBuilding,
@@ -29,6 +31,11 @@ export function BuildingFloorTab() {
   const selectedBuildingRef = useRef<HTMLDivElement>(null);
 
   const floors = selectedBuilding ? getFloorsForBuilding(selectedBuilding.id) : [];
+
+  const handleOpenMapEditor = (floorId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/map-editor?floorId=${floorId}`);
+  };
 
   // 選択されたビルの位置にスクロール
   useEffect(() => {
@@ -174,7 +181,7 @@ export function BuildingFloorTab() {
                   const hasMap = floor.ugomap && mapImage;
 
                   return (
-                    <Card key={floor.id} className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden">
+                    <Card key={floor.id} className="hover:shadow-md transition-shadow overflow-hidden">
                       {hasMap ? (
                         <div className="aspect-video w-full overflow-hidden bg-gray-100">
                           <img
@@ -188,10 +195,21 @@ export function BuildingFloorTab() {
                           <span className="text-sm text-gray-500">マップ未登録</span>
                         </div>
                       )}
-                      <CardHeader className="p-4">
+                      <CardHeader className="p-4 pb-2">
                         <CardTitle className="text-base">{floor.name}</CardTitle>
                         <CardDescription className="text-xs">{floor.description}</CardDescription>
                       </CardHeader>
+                      <CardContent className="p-4 pt-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={(e) => handleOpenMapEditor(floor.id, e)}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          マップエディタを開く
+                        </Button>
+                      </CardContent>
                     </Card>
                   );
                 })}
@@ -205,7 +223,7 @@ export function BuildingFloorTab() {
                   return (
                     <div
                       key={floor.id}
-                      className="cursor-pointer p-3 rounded border hover:bg-gray-100 transition-colors flex items-center gap-4"
+                      className="p-3 rounded border hover:bg-gray-100 transition-colors flex items-center gap-4"
                     >
                       {hasMap ? (
                         <div className="w-24 h-16 flex-shrink-0 overflow-hidden rounded bg-gray-100">
@@ -220,10 +238,18 @@ export function BuildingFloorTab() {
                           <span className="text-xs text-gray-500">未登録</span>
                         </div>
                       )}
-                      <div>
+                      <div className="flex-1">
                         <div className="font-medium">{floor.name}</div>
                         <div className="text-xs text-gray-600">{floor.description}</div>
                       </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => handleOpenMapEditor(floor.id, e)}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        マップエディタ
+                      </Button>
                     </div>
                   );
                 })}
