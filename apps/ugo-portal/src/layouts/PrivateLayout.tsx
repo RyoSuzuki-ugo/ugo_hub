@@ -23,7 +23,7 @@ export function PrivateLayout() {
   const location = useLocation();
 
   const menuItems = [
-    { path: '/dashboard', label: 'ダッシュボード', description: '概要を確認', icon: Home },
+    { path: '/dashboard', label: 'ダッシュボード', description: '各種情報', icon: Home },
     { path: '/operating', label: 'オペレーティング', description: 'ロボット操作', icon: MonitorPlay },
     { path: '/planning', label: 'プランニング', description: '業務計画', icon: Calendar },
     { path: '/management', label: 'マネジメント', description: '管理機能', icon: Building2 },
@@ -36,7 +36,7 @@ export function PrivateLayout() {
     <SidebarProvider defaultOpen={true}>
       <Sidebar collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center justify-between px-2 py-2">
+          <div className="flex items-center justify-between px-2 py-2 group-data-[collapsible=icon]:justify-center">
             <div className="flex-1 group-data-[collapsible=icon]:hidden">
               <h1 className="text-lg font-bold">ugo portal</h1>
               {operator && (
@@ -59,11 +59,11 @@ export function PrivateLayout() {
                     <SidebarMenuItem key={item.path}>
                       <SidebarMenuButton
                         onClick={() => navigate(item.path)}
-                        className={
+                        className={`group-data-[collapsible=icon]:justify-center ${
                           isActive(item.path)
                             ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                             : ''
-                        }
+                        }`}
                         title={item.label}
                       >
                         <Icon />
