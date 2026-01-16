@@ -9,6 +9,8 @@ interface DestinationMarkerProps {
   name: string;
   mapRealSize?: number;
   color?: string;
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
 /**
@@ -21,6 +23,8 @@ export function DestinationMarker({
   name,
   mapRealSize = 30,
   color = "#FF0000",
+  isSelected = false,
+  onClick,
 }: DestinationMarkerProps) {
   const meshRef = useRef<Mesh>(null);
 
@@ -29,30 +33,41 @@ export function DestinationMarker({
   const z3d = -(y - mapRealSize / 2);
   const y3d = 0;
 
+  const markerColor = isSelected ? "#0066FF" : color;
+  const scale = isSelected ? 1.2 : 1;
+
   return (
-    <group position={[x3d, y3d, z3d]} rotation={[0, r, 0]}>
+    <group
+      position={[x3d, y3d, z3d]}
+      rotation={[0, r, 0]}
+      scale={scale}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
+    >
       {/* ピンの棒部分 */}
       <mesh position={[0, 0.4, 0]}>
         <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={markerColor} />
       </mesh>
 
       {/* ピンの頭部分（球） */}
       <mesh position={[0, 0.9, 0]}>
         <sphereGeometry args={[0.15, 16, 16]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={markerColor} />
       </mesh>
 
       {/* 底面の円（影のような効果） */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
         <circleGeometry args={[0.2, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.3} />
+        <meshBasicMaterial color={markerColor} transparent opacity={0.3} />
       </mesh>
 
       {/* 向きを示す矢印（円錐） */}
       <mesh position={[0.3, 0.01, 0]} rotation={[0, 0, -Math.PI / 2]}>
         <coneGeometry args={[0.1, 0.3, 8]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial color={markerColor} />
       </mesh>
 
       {/* 名前表示 */}

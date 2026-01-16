@@ -33,14 +33,18 @@ function MapEditorContent() {
     floor,
     loading,
     destinations,
+    selectedDestinationId,
+    setSelectedDestinationId,
   } = useMapEditor();
+
+  // 選択された目的地の座標を取得
+  const selectedDestination = destinations.find(
+    (d) => d.id === selectedDestinationId
+  );
 
   return (
     <div className="w-full h-screen flex flex-col">
       <div className="flex items-center gap-4 p-4 border-b">
-        <Button variant="outline" size="icon" onClick={() => navigate("/planning")}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
         <div>
           <h1 className="text-3xl font-bold">マップエディタ</h1>
           <p className="text-muted-foreground">
@@ -77,12 +81,15 @@ function MapEditorContent() {
                   r={dest.r}
                   name={dest.name}
                   mapRealSize={mapRealSize}
+                  isSelected={selectedDestinationId === dest.id}
+                  onClick={() => setSelectedDestinationId(dest.id)}
                 />
               ))}
 
               <MapControls
                 followMode={followMode}
                 followTarget={showRobot && robotPosition ? robotPosition : null}
+                centerTarget={selectedDestination ? { x: selectedDestination.x, y: selectedDestination.y } : null}
                 mapRealSize={mapRealSize}
               />
               <MapCamera />
@@ -109,33 +116,46 @@ function MapEditorContent() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {destinations.map((dest) => (
-                    <div
-                      key={dest.id}
-                      className="p-3 border rounded-lg hover:bg-accent cursor-pointer"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">{dest.name}</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            座標: ({dest.x}, {dest.y})
+                  {destinations.map((dest) => {
+                    const isSelected = selectedDestinationId === dest.id;
+                    return (
+                      <div
+                        key={dest.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          isSelected
+                            ? "bg-gray-200"
+                            : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => setSelectedDestinationId(dest.id)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">{dest.name}</div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              座標: ({dest.x}, {dest.y})
+                            </div>
                           </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>コマンド設定</DropdownMenuItem>
+                              <DropdownMenuItem>削除</DropdownMenuItem>
+                              <DropdownMenuItem>テスト走行</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>コマンド設定</DropdownMenuItem>
-                            <DropdownMenuItem>削除</DropdownMenuItem>
-                            <DropdownMenuItem>テスト走行</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -6,6 +6,7 @@ import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 export interface MapControlsProps {
   readonly followMode?: boolean;
   readonly followTarget?: { readonly x: number; readonly y: number } | null;
+  readonly centerTarget?: { readonly x: number; readonly y: number } | null;
   readonly mapRealSize?: number;
 }
 
@@ -14,14 +15,38 @@ export interface MapControlsProps {
  * ズーム、パン、回転操作を提供
  * 右ダブルクリックで平面視点に戻る
  * followMode=trueの場合、カメラがfollowTargetを追従
+ * centerTargetが指定された場合、そこにカメラを移動
  */
 export function MapControls({
   followMode = false,
   followTarget = null,
+  centerTarget = null,
   mapRealSize = 30,
 }: MapControlsProps) {
   const controlsRef = useRef<OrbitControlsType>(null);
   const { camera, gl } = useThree();
+  const prevCenterTarget = useRef<{ x: number; y: number } | null>(null);
+
+  // centerTargetへのカメラ移動
+  useEffect(() => {
+    if (centerTarget && controlsRef.current) {
+      // centerTargetが変更された場合のみ移動
+      if (
+        !prevCenterTarget.current ||
+        prevCenterTarget.current.x !== centerTarget.x ||
+        prevCenterTarget.current.y !== centerTarget.y
+      ) {
+        const targetX = centerTarget.x - mapRealSize / 2;
+        const targetZ = -(centerTarget.y - mapRealSize / 2);
+
+        controlsRef.current.target.set(targetX, 0, targetZ);
+        camera.position.set(targetX, camera.position.y, targetZ);
+        controlsRef.current.update();
+
+        prevCenterTarget.current = { x: centerTarget.x, y: centerTarget.y };
+      }
+    }
+  }, [centerTarget, camera, mapRealSize]);
 
   // フォローモード時にカメラをロボットに追従させる
   useFrame(() => {

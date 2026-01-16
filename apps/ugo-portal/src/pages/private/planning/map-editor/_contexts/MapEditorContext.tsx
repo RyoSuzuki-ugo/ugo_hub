@@ -26,6 +26,8 @@ interface MapEditorContextType {
   // 目的地
   destinations: Destination[];
   setDestinations: (destinations: Destination[]) => void;
+  selectedDestinationId: string | null;
+  setSelectedDestinationId: (id: string | null) => void;
 
   // フロア情報
   floor: FloorWithRelations | null;
@@ -67,10 +69,12 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
   const [mapRealSize, setMapRealSize] = useState<number>(30); // デフォルト30m x 30m
 
   // ロボット関連
-  const [showRobot, setShowRobot] = useState<boolean>(false);
-  const [robotPosition, setRobotPosition] = useState<RobotPosition | null>(
-    null
-  );
+  const [showRobot, setShowRobot] = useState<boolean>(true);
+  const [robotPosition, setRobotPosition] = useState<RobotPosition | null>({
+    x: 14,
+    y: 11,
+    r: Math.PI / 4,
+  });
 
   // 目的地（モックデータ）
   const [destinations, setDestinations] = useState<Destination[]>([
@@ -78,6 +82,7 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
     { id: "dest-2", name: "目的地 B", x: 15, y: 8, r: Math.PI / 2 },
     { id: "dest-3", name: "目的地 C", x: 8, y: 13, r: Math.PI },
   ]);
+  const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null);
 
   // フロア情報
   const [floor, setFloor] = useState<FloorWithRelations | null>(null);
@@ -152,6 +157,8 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
     setRobotPosition,
     destinations,
     setDestinations,
+    selectedDestinationId,
+    setSelectedDestinationId,
     floor,
     loading,
     selectedBuildingId,
