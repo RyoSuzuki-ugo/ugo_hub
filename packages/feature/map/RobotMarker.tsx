@@ -9,6 +9,7 @@ import type { RobotPosition } from "./types";
 interface RobotMarkerProps {
   position: RobotPosition;
   mapRealSize?: number; // マップの実際のサイズ（メートル単位）
+  isSelected?: boolean; // 選択状態
 }
 
 // デフォルトポーズ
@@ -76,7 +77,7 @@ const POSLIST: { [key: number]: [number, number, number, number] } = {
  * 3D空間上のロボット位置マーカー
  * FBXモデルでロボットの位置と向きを表示
  */
-export function RobotMarker({ position, mapRealSize = 30 }: RobotMarkerProps) {
+export function RobotMarker({ position, mapRealSize = 30, isSelected = false }: RobotMarkerProps) {
   const meshRef = useRef<Mesh>(null);
 
   // FBXモデルを読み込み
@@ -290,6 +291,14 @@ export function RobotMarker({ position, mapRealSize = 30 }: RobotMarkerProps) {
         <coneGeometry args={[0.1, 0.25, 3]} />
         <meshBasicMaterial color="#FF0000" />
       </mesh>
+
+      {/* 選択状態を示すリング */}
+      {isSelected && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+          <ringGeometry args={[0.4, 0.5, 32]} />
+          <meshBasicMaterial color="#00FF00" transparent opacity={0.6} />
+        </mesh>
+      )}
     </group>
   );
 }

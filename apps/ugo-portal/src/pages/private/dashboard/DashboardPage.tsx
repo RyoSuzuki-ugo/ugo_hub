@@ -1,18 +1,15 @@
-import { Battery, Wifi, MapPin, Activity, TrendingUp, AlertTriangle, Clock, Download } from "lucide-react";
+import { TrendingUp, AlertTriangle, Clock, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Progress } from "@repo/shared-ui/components/progress";
 import { Button } from "@repo/shared-ui/components/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@repo/shared-ui/components/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/components/tabs";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useState } from "react";
-import { SkywayRoom } from "@repo/feature";
-
-// Serial number for Skyway streaming
-const serialNo = "UM01AA-A294X0006";
+import { RobotCard, RobotDetailDialog } from "../../../features/robot-card";
+import type { RobotData } from "../../../features/robot-card";
 
 // Mock robot data
-const robots = [
+const robots: RobotData[] = [
   {
     serialNo: "UGO-2024-001",
     name: "ロボット A",
@@ -114,31 +111,10 @@ const errorFrequencyData = [
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#3b82f6'];
 
 export function DashboardPage() {
-  const [selectedRobot, setSelectedRobot] = useState<typeof robots[0] | null>(null);
+  const [selectedRobot, setSelectedRobot] = useState<RobotData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const getStatusColor = (color: string) => {
-    switch (color) {
-      case "green":
-        return "text-green-600";
-      case "blue":
-        return "text-blue-600";
-      case "yellow":
-        return "text-yellow-600";
-      case "red":
-        return "text-red-600";
-      default:
-        return "text-gray-600";
-    }
-  };
-
-  const getBatteryColor = (battery: number) => {
-    if (battery > 50) return "text-green-600";
-    if (battery > 20) return "text-yellow-600";
-    return "text-red-600";
-  };
-
-  const handleRobotClick = (robot: typeof robots[0]) => {
+  const handleRobotClick = (robot: RobotData) => {
     setSelectedRobot(robot);
     setIsModalOpen(true);
   };
@@ -163,206 +139,21 @@ export function DashboardPage() {
           {/* Robot Grid View */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {robots.map((robot) => (
-              <Card
+              <RobotCard
                 key={robot.serialNo}
-                className="cursor-pointer hover:shadow-lg transition-shadow"
+                robot={robot}
                 onClick={() => handleRobotClick(robot)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{robot.name}</CardTitle>
-                      <p className="text-xs text-muted-foreground mt-1">{robot.serialNo}</p>
-                    </div>
-                    <Activity className={`h-5 w-5 ${getStatusColor(robot.statusColor)}`} />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* Skyway Streaming Video */}
-                  <div className="w-full aspect-video bg-black rounded-md overflow-hidden">
-                    <SkywayRoom
-                      channelName={serialNo}
-                      autoJoin
-                      fullScreen={false}
-                      showSettings={false}
-                      onConnectionChange={(connected: boolean) => {
-                        console.log("SkywayRoom Connection status:", connected);
-                      }}
-                      onError={(error: unknown) => {
-                        console.error("SkywayRoom error:", error);
-                      }}
-                    />
-                  </div>
-                  {/* Status */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">ステータス</span>
-                    <span className={`text-sm font-medium ${getStatusColor(robot.statusColor)}`}>
-                      {robot.status}
-                    </span>
-                  </div>
-
-                  {/* Battery */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">バッテリー</span>
-                      <span className={`text-sm font-medium ${getBatteryColor(robot.battery)}`}>
-                        {robot.battery}%
-                      </span>
-                    </div>
-                    <Progress value={robot.battery} />
-                  </div>
-
-                  {/* Location */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">現在地</span>
-                    <span className="text-sm font-medium">{robot.location}</span>
-                  </div>
-
-                  {/* Communication */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">通信状態</span>
-                    <div className="flex items-center gap-1">
-                      <Wifi className="h-3 w-3 text-green-600" />
-                      <span className="text-sm font-medium text-green-600">{robot.communication}</span>
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // TODO: Navigate to operating page
-                      console.log(`操作画面を開く: ${robot.serialNo}`);
-                    }}
-                  >
-                    操作画面を開く
-                  </Button>
-                </CardContent>
-              </Card>
+                onOperateClick={(serialNo) => console.log(`操作画面を開く: ${serialNo}`)}
+              />
             ))}
           </div>
 
           {/* Robot Detail Modal */}
-          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              {selectedRobot && (
-                <>
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      {selectedRobot.name}
-                      <span className="text-sm font-normal text-muted-foreground">
-                        ({selectedRobot.serialNo})
-                      </span>
-                    </DialogTitle>
-                  </DialogHeader>
-
-                  <div className="space-y-6">
-                    {/* Robot Status */}
-                    <div>
-                      <h3 className="text-lg font-medium mb-3 text-muted-foreground">ロボット状態</h3>
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <Card>
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">現在のステータス</CardTitle>
-                            <Activity className={`h-4 w-4 ${getStatusColor(selectedRobot.statusColor)}`} />
-                          </CardHeader>
-                          <CardContent>
-                            <div className={`text-2xl font-bold ${getStatusColor(selectedRobot.statusColor)}`}>
-                              {selectedRobot.status}
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">Flow: {selectedRobot.currentFlow}</p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">現在地</CardTitle>
-                            <MapPin className="h-4 w-4 text-blue-600" />
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold">{selectedRobot.location}</div>
-                            <p className="text-xs text-muted-foreground mt-1">{selectedRobot.building}</p>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">バッテリー残量</CardTitle>
-                            <Battery className={`h-4 w-4 ${getBatteryColor(selectedRobot.battery)}`} />
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold">{selectedRobot.battery}%</div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              推定稼働時間: {selectedRobot.batteryTime}
-                            </p>
-                            <Progress value={selectedRobot.battery} className="mt-2" />
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">通信状態</CardTitle>
-                            <Wifi className="h-4 w-4 text-green-600" />
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold text-green-600">{selectedRobot.communication}</div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Wi-Fi強度: {selectedRobot.wifiStrength}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </div>
-
-                    {/* Today's Operations */}
-                    <div>
-                      <h3 className="text-lg font-medium mb-3 text-muted-foreground">本日の運用状況</h3>
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-sm font-medium">Flow実行状況</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm">完了率</span>
-                                <span className="text-2xl font-bold">{selectedRobot.todayCompletion}%</span>
-                              </div>
-                              <Progress value={selectedRobot.todayCompletion} />
-                              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                                <span>完了: {selectedRobot.todayCompleted}件</span>
-                                <span>未完了: {selectedRobot.todayPending}件</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader>
-                            <CardTitle className="text-sm font-medium">次のスケジュール</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-2">
-                              {selectedRobot.schedule.map((item, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                  <Clock className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm">{item.time}</span>
-                                  <span className="text-sm font-medium">{item.flow}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </DialogContent>
-          </Dialog>
+          <RobotDetailDialog
+            robot={selectedRobot}
+            open={isModalOpen}
+            onOpenChange={setIsModalOpen}
+          />
             </section>
           </TabsContent>
 

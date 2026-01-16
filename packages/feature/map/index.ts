@@ -1,5 +1,6 @@
 // Map components export
 export { FloorMapViewer3D } from "./FloorMapViewer3D";
+export { MultiRobotMapViewer } from "./MultiRobotMapViewer";
 export { RobotMarker } from "./RobotMarker";
 export { LidarPoints } from "./LidarPoints";
 export { MapControls } from "./MapControls";
