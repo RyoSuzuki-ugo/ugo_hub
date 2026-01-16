@@ -74,9 +74,11 @@ export default function AuthProvider({
 
   useEffect(() => {
     const checkAuth = () => {
-      // ログインページの場合は認証チェックをスキップ
+      // ログインページの場合は認証チェックをスキップし、警告フラグをリセット
       if (pathname === "/login") {
         setLoading(false);
+        setHasShownWarning(false); // ログインページでは警告フラグをリセット
+        setShowExpiryDialog(false);
         return;
       }
 
@@ -92,6 +94,7 @@ export default function AuthProvider({
           console.warn("Token is invalid or expired");
           localStorage.removeItem("user-token");
           localStorage.removeItem("operator_data");
+          setHasShownWarning(false); // トークン無効時に警告フラグをリセット
           navigate(`/login?returnUrl=${encodeURIComponent(pathname)}`);
           return;
         }
@@ -102,6 +105,11 @@ export default function AuthProvider({
           const minutes = Math.floor(remainingTime / 60000);
           console.warn(`Token expires in ${minutes} minutes`);
           // TODO: トークンリフレッシュまたは警告表示の実装
+        } else {
+          // トークンが十分に有効な場合は警告フラグをリセット
+          if (hasShownWarning) {
+            setHasShownWarning(false);
+          }
         }
 
         // localStorageからoperator情報を取得
@@ -122,6 +130,7 @@ export default function AuthProvider({
         console.error("Authentication failed:", error);
         localStorage.removeItem("user-token");
         localStorage.removeItem("operator_data");
+        setHasShownWarning(false); // エラー時に警告フラグをリセット
         navigate(`/login?returnUrl=${encodeURIComponent(pathname)}`);
       } finally {
         setLoading(false);
@@ -129,7 +138,7 @@ export default function AuthProvider({
     };
 
     checkAuth();
-  }, [pathname, navigate]);
+  }, [pathname, navigate, hasShownWarning]);
 
   const logout = async () => {
     try {
