@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Input } from "@repo/shared-ui/components/input";
 import { Button } from "@repo/shared-ui/components/button";
@@ -25,7 +25,19 @@ export function BuildingFloorTab() {
   const [floorSortOrder, setFloorSortOrder] = useState<"asc" | "desc">("asc");
   const [floorViewMode, setFloorViewMode] = useState<FloorViewMode>("card");
 
+  const selectedBuildingRef = useRef<HTMLDivElement>(null);
+
   const floors = selectedBuilding ? getFloorsForBuilding(selectedBuilding.id) : [];
+
+  // 選択されたビルの位置にスクロール
+  useEffect(() => {
+    if (selectedBuildingRef.current) {
+      selectedBuildingRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [selectedBuilding?.id]);
 
   // フロアのフィルタリングとソート
   const filteredFloors = floors
@@ -41,7 +53,7 @@ export function BuildingFloorTab() {
     });
 
   return (
-    <div className="flex gap-6 h-full">
+    <div className="flex gap-6" style={{ height: "calc(100vh - 250px)" }}>
       {/* 左側: ビル一覧 (3割) */}
       <div className="w-[30%] h-full">
         <Card className="h-full flex flex-col">
@@ -84,6 +96,7 @@ export function BuildingFloorTab() {
             {filteredBuildings.map((building) => (
               <div
                 key={building.id}
+                ref={selectedBuilding?.id === building.id ? selectedBuildingRef : null}
                 onClick={() => setSelectedBuilding(building)}
                 className={`cursor-pointer p-3 rounded border transition-colors ${
                   selectedBuilding?.id === building.id

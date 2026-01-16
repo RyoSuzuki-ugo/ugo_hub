@@ -62,9 +62,12 @@ export function BuildingFloorProvider({ children }: { children: ReactNode }) {
 
         setBuildings(formattedBuildings);
 
-        // 最初のビルを自動選択
+        // operatorのbuildingIdに一致するビルを自動選択、なければ最初のビルを選択
         if (formattedBuildings.length > 0) {
-          setSelectedBuilding(formattedBuildings[0]);
+          const defaultBuilding = operator?.buildingId
+            ? formattedBuildings.find((b) => b.id === operator.buildingId)
+            : null;
+          setSelectedBuilding(defaultBuilding || formattedBuildings[0]);
         }
       } catch (error) {
         console.error("Failed to fetch buildings:", error);

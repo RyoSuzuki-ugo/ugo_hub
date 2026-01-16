@@ -78,6 +78,7 @@ export function MultiRobotMapViewer({
             position={robot}
             mapRealSize={mapRealSize}
             isSelected={robot.id === selectedRobotId}
+            onClick={() => onRobotClick?.(robot.id)}
           />
         ))}
 

@@ -10,6 +10,7 @@ interface RobotMarkerProps {
   position: RobotPosition;
   mapRealSize?: number; // マップの実際のサイズ（メートル単位）
   isSelected?: boolean; // 選択状態
+  onClick?: () => void; // クリックハンドラ
 }
 
 // デフォルトポーズ
@@ -77,7 +78,7 @@ const POSLIST: { [key: number]: [number, number, number, number] } = {
  * 3D空間上のロボット位置マーカー
  * FBXモデルでロボットの位置と向きを表示
  */
-export function RobotMarker({ position, mapRealSize = 30, isSelected = false }: RobotMarkerProps) {
+export function RobotMarker({ position, mapRealSize = 30, isSelected = false, onClick }: RobotMarkerProps) {
   const meshRef = useRef<Mesh>(null);
 
   // FBXモデルを読み込み
@@ -273,7 +274,10 @@ export function RobotMarker({ position, mapRealSize = 30, isSelected = false }: 
   const robotHeight = 0.556;
 
   return (
-    <group position={[x3d, y3d, z3d]} rotation={[0, position.r, 0]}>
+    <group position={[x3d, y3d, z3d]} rotation={[0, position.r, 0]} onClick={(e) => {
+      e.stopPropagation();
+      onClick?.();
+    }}>
       {/* FBXモデル（180度回転） */}
       <group rotation={[0, Math.PI, 0]} scale={0.01}>
         {/* ベースモデル */}

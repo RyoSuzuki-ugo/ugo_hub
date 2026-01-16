@@ -23,8 +23,8 @@ export function PrivateLayout() {
   const location = useLocation();
 
   const menuItems = [
-    { path: '/dashboard', label: 'ダッシュボード', description: '各種情報', icon: Home },
-    { path: '/operating', label: 'オペレーティング', description: 'ロボット操作', icon: MonitorPlay },
+    { path: '/dashboard', label: 'ダッシュボード', description: '各種統計情報など', icon: Home },
+    { path: '/operating', label: 'オペレーティング', description: 'ロボット操作・レポートなど', icon: MonitorPlay },
     { path: '/planning', label: 'プランニング', description: '業務計画', icon: Calendar },
     { path: '/management', label: 'マネジメント', description: '管理機能', icon: Building2 },
     { path: '/system-settings', label: 'システム設定', description: 'システム管理', icon: Settings },
