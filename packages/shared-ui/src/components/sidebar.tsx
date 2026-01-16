@@ -96,8 +96,9 @@ const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     side?: "left" | "right";
+    collapsible?: "offcanvas" | "icon" | "none";
   }
->(({ side = "left", className, children, ...props }, ref) => {
+>(({ side = "left", collapsible = "offcanvas", className, children, ...props }, ref) => {
   const { isMobile, openMobile, setOpenMobile, open } = useSidebar();
 
   if (isMobile) {
@@ -113,22 +114,61 @@ const Sidebar = React.forwardRef<
     );
   }
 
+  // Icon mode: sidebar collapses to icons only
+  if (collapsible === "icon") {
+    return (
+      <div
+        ref={ref}
+        data-collapsible={open ? "open" : "icon"}
+        className={cn(
+          "group flex h-svh flex-col bg-sidebar text-sidebar-foreground border-r transition-all duration-200 ease-linear",
+          open ? "w-64" : "w-16",
+          className
+        )}
+        {...props}
+      >
+        <div className="flex-1 overflow-hidden">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  // Offcanvas mode: sidebar collapses to zero width
+  if (collapsible === "offcanvas") {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "flex h-svh flex-col bg-sidebar text-sidebar-foreground border-r transition-all duration-200 ease-linear",
+          open ? "w-64" : "w-0 border-r-0",
+          className
+        )}
+        {...props}
+      >
+        <div
+          className={cn(
+            "flex-1 overflow-hidden",
+            open ? "opacity-100" : "opacity-0"
+          )}
+        >
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  // None mode: sidebar always visible
   return (
     <div
       ref={ref}
       className={cn(
-        "flex h-svh flex-col bg-sidebar text-sidebar-foreground border-r transition-all duration-200 ease-linear",
-        open ? "w-64" : "w-0 border-r-0",
+        "flex h-svh w-64 flex-col bg-sidebar text-sidebar-foreground border-r",
         className
       )}
       {...props}
     >
-      <div
-        className={cn(
-          "flex-1 overflow-hidden",
-          open ? "opacity-100" : "opacity-0"
-        )}
-      >
+      <div className="flex-1 overflow-hidden">
         {children}
       </div>
     </div>
