@@ -3,8 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@repo/shared-ui/compon
 import { Progress } from "@repo/shared-ui/components/progress";
 import { Button } from "@repo/shared-ui/components/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@repo/shared-ui/components/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/components/tabs";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useState } from "react";
+import { SkywayRoom } from "@repo/feature";
+
+// Serial number for Skyway streaming
+const serialNo = "UM01AA-A294X0006";
 
 // Mock robot data
 const robots = [
@@ -67,45 +72,6 @@ const robots = [
     schedule: [
       { time: "15:30", flow: "監視業務" },
       { time: "17:00", flow: "清掃" },
-    ],
-  },
-  {
-    serialNo: "UGO-2024-004",
-    name: "ロボット D",
-    status: "配送中",
-    statusColor: "green",
-    currentFlow: "オフィス配送",
-    location: "4F 西エリア",
-    building: "本社ビル",
-    battery: 62,
-    batteryTime: "約3.3時間",
-    communication: "良好",
-    wifiStrength: "-48 dBm",
-    todayCompletion: 85,
-    todayCompleted: 34,
-    todayPending: 6,
-    schedule: [
-      { time: "14:00", flow: "書類配送" },
-      { time: "16:30", flow: "清掃業務" },
-    ],
-  },
-  {
-    serialNo: "UGO-2024-005",
-    name: "ロボット E",
-    status: "エラー",
-    statusColor: "red",
-    currentFlow: "-",
-    location: "5F エレベーター前",
-    building: "本社ビル",
-    battery: 28,
-    batteryTime: "約1.5時間",
-    communication: "不安定",
-    wifiStrength: "-68 dBm",
-    todayCompletion: 65,
-    todayCompleted: 26,
-    todayPending: 14,
-    schedule: [
-      { time: "要対応", flow: "メンテナンス" },
     ],
   },
 ];
@@ -182,9 +148,17 @@ export function DashboardPage() {
       <div className="p-8">
         <h1 className="text-3xl font-bold mb-8">ダッシュボード</h1>
 
-        {/* Real-time Information */}
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary">リアルタイム情報</h2>
+        <Tabs defaultValue="realtime" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="realtime">リアルタイム</TabsTrigger>
+            <TabsTrigger value="operations">運用情報</TabsTrigger>
+            <TabsTrigger value="maintenance">メンテナンス</TabsTrigger>
+            <TabsTrigger value="reports">レポート</TabsTrigger>
+          </TabsList>
+
+          {/* Tab 1: Real-time Information */}
+          <TabsContent value="realtime">
+            <section className="mb-8">
 
           {/* Robot Grid View */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -204,6 +178,21 @@ export function DashboardPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  {/* Skyway Streaming Video */}
+                  <div className="w-full aspect-video bg-black rounded-md overflow-hidden">
+                    <SkywayRoom
+                      channelName={serialNo}
+                      autoJoin
+                      fullScreen={false}
+                      showSettings={false}
+                      onConnectionChange={(connected: boolean) => {
+                        console.log("SkywayRoom Connection status:", connected);
+                      }}
+                      onError={(error: unknown) => {
+                        console.error("SkywayRoom error:", error);
+                      }}
+                    />
+                  </div>
                   {/* Status */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">ステータス</span>
@@ -374,11 +363,12 @@ export function DashboardPage() {
               )}
             </DialogContent>
           </Dialog>
-        </section>
+            </section>
+          </TabsContent>
 
-        {/* Operational Information */}
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary">運用情報（日次・月次）</h2>
+          {/* Tab 2: Operational Information */}
+          <TabsContent value="operations">
+            <section className="mb-8">
 
           {/* Charts */}
           <div className="mb-6">
@@ -460,11 +450,12 @@ export function DashboardPage() {
               </Card>
             </div>
           </div>
-        </section>
+            </section>
+          </TabsContent>
 
-        {/* Maintenance Information */}
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary">メンテナンス情報</h2>
+          {/* Tab 3: Maintenance Information */}
+          <TabsContent value="maintenance">
+            <section className="mb-8">
 
           {/* Charts */}
           <div className="mb-6">
@@ -598,11 +589,12 @@ export function DashboardPage() {
               </CardContent>
             </Card>
           </div>
-        </section>
+            </section>
+          </TabsContent>
 
-        {/* Management and Reports */}
-        <section className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary">管理・レポート</h2>
+          {/* Tab 4: Management and Reports */}
+          <TabsContent value="reports">
+            <section className="mb-8">
 
           {/* Export and Statistics */}
           <div className="mb-6">
@@ -678,7 +670,9 @@ export function DashboardPage() {
               </CardContent>
             </Card>
           </div>
-        </section>
+            </section>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

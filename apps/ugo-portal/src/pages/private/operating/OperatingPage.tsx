@@ -20,32 +20,6 @@ export function OperatingPage() {
         </div>
       </div>
 
-      {/* ロボットカード */}
-      <div className="mb-8">
-        <Card>
-          <CardHeader className="bg-gray-800 text-white">
-            <CardTitle>{serialNo}</CardTitle>
-            <CardDescription className="text-gray-300">ロボット操作画面</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-[600px]">
-              <SkywayRoom
-                channelName={serialNo}
-                autoJoin
-                fullScreen={false}
-                showSettings={false}
-                onConnectionChange={(connected: boolean) => {
-                  console.log("SkywayRoom Connection status:", connected);
-                }}
-                onError={(error: unknown) => {
-                  console.error("SkywayRoom error:", error);
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* 機能カード */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
