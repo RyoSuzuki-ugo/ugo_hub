@@ -7,8 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/shared-ui/components/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/shared-ui/components/dialog";
 import { Canvas } from "@react-three/fiber";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import {
   FloorMapPlane,
   RobotMarker,
@@ -17,10 +23,12 @@ import {
   MapCamera,
   MapLighting,
 } from "@repo/feature";
-import { MapEditorProvider, useMapEditor } from "./_contexts/MapEditorContext";
+import { MapEditorProvider, useMapEditor, type Destination } from "./_contexts/MapEditorContext";
 
 function MapEditorContent() {
   const navigate = useNavigate();
+  const [commandDialogOpen, setCommandDialogOpen] = useState(false);
+  const [selectedDestForCommand, setSelectedDestForCommand] = useState<Destination | null>(null);
   const {
     mapImageUrl,
     showRobot,
@@ -147,7 +155,15 @@ function MapEditorContent() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>コマンド設定</DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedDestForCommand(dest);
+                                  setCommandDialogOpen(true);
+                                }}
+                              >
+                                コマンド設定
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>コマンドテスト実行</DropdownMenuItem>
                               <DropdownMenuItem>削除</DropdownMenuItem>
                               <DropdownMenuItem>テスト走行</DropdownMenuItem>
                             </DropdownMenuContent>
@@ -201,6 +217,32 @@ function MapEditorContent() {
           </div>
         </div>
       </div>
+
+      {/* コマンド設定ダイアログ */}
+      <Dialog open={commandDialogOpen} onOpenChange={setCommandDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedDestForCommand?.name} - コマンド一覧
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {selectedDestForCommand?.commands?.map((cmd) => (
+              <div
+                key={cmd.id}
+                className="p-3 border rounded-lg hover:bg-gray-50"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-semibold">
+                    {cmd.order}
+                  </div>
+                  <div className="flex-1 font-medium">{cmd.name}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -2,12 +2,19 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import type { RobotPosition } from "@repo/feature";
 import { floorService, buildingApi, type FloorWithRelations } from "@repo/api-client";
 
+export interface Command {
+  id: string;
+  name: string;
+  order: number;
+}
+
 export interface Destination {
   id: string;
   name: string;
   x: number;
   y: number;
   r: number;
+  commands?: Command[];
 }
 
 interface MapEditorContextType {
@@ -78,9 +85,51 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
 
   // 目的地（モックデータ）
   const [destinations, setDestinations] = useState<Destination[]>([
-    { id: "dest-1", name: "目的地 A", x: 10, y: 10, r: 0 },
-    { id: "dest-2", name: "目的地 B", x: 15, y: 8, r: Math.PI / 2 },
-    { id: "dest-3", name: "目的地 C", x: 8, y: 13, r: Math.PI },
+    {
+      id: "dest-1",
+      name: "目的地 A",
+      x: 10,
+      y: 10,
+      r: 0,
+      commands: [
+        { id: "cmd-1", name: "目的地まで移動", order: 1 },
+        { id: "cmd-2", name: "レポート開始", order: 2 },
+        { id: "cmd-3", name: "ポールを伸ばす", order: 3 },
+        { id: "cmd-4", name: "写真を撮影する", order: 4 },
+        { id: "cmd-5", name: "レポート終了", order: 5 },
+        { id: "cmd-6", name: "ポールを戻す", order: 6 },
+      ],
+    },
+    {
+      id: "dest-2",
+      name: "目的地 B",
+      x: 15,
+      y: 8,
+      r: Math.PI / 2,
+      commands: [
+        { id: "cmd-7", name: "目的地まで移動", order: 1 },
+        { id: "cmd-8", name: "レポート開始", order: 2 },
+        { id: "cmd-9", name: "ポールを伸ばす", order: 3 },
+        { id: "cmd-10", name: "写真を撮影する", order: 4 },
+        { id: "cmd-11", name: "レポート終了", order: 5 },
+        { id: "cmd-12", name: "ポールを戻す", order: 6 },
+      ],
+    },
+    {
+      id: "dest-3",
+      name: "目的地 C",
+      x: 8,
+      y: 13,
+      r: Math.PI,
+      commands: [
+        { id: "cmd-13", name: "目的地まで移動", order: 1 },
+        { id: "cmd-14", name: "レポート開始", order: 2 },
+        { id: "cmd-15", name: "ポールを伸ばす", order: 3 },
+        { id: "cmd-16", name: "写真を撮影する", order: 4 },
+        { id: "cmd-17", name: "レポート終了", order: 5 },
+        { id: "cmd-18", name: "ポールを戻す", order: 6 },
+      ],
+    },
   ]);
   const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null);
 
