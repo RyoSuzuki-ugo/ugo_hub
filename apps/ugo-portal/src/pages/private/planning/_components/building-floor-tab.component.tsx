@@ -17,6 +17,7 @@ export function BuildingFloorTab() {
     setSearchQuery,
     sortOrder,
     setSortOrder,
+    floorMapImages,
   } = useBuildingFloor();
 
   const [showSearch, setShowSearch] = useState(false);
@@ -168,28 +169,64 @@ export function BuildingFloorTab() {
           <div className="flex-1 p-4 pt-0 overflow-y-auto">
             {floorViewMode === "card" ? (
               <div className="grid grid-cols-3 gap-4">
-                {filteredFloors.map((floor) => (
-                  <Card key={floor.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardHeader className="p-4">
-                      <CardTitle className="text-base">{floor.name}</CardTitle>
-                      <CardDescription className="text-xs">{floor.description}</CardDescription>
-                    </CardHeader>
-                  </Card>
-                ))}
+                {filteredFloors.map((floor) => {
+                  const mapImage = floorMapImages[floor.id];
+                  const hasMap = floor.ugomap && mapImage;
+
+                  return (
+                    <Card key={floor.id} className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden">
+                      {hasMap ? (
+                        <div className="aspect-video w-full overflow-hidden bg-gray-100">
+                          <img
+                            src={mapImage}
+                            alt={floor.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-video w-full bg-gray-100 flex items-center justify-center">
+                          <span className="text-sm text-gray-500">マップ未登録</span>
+                        </div>
+                      )}
+                      <CardHeader className="p-4">
+                        <CardTitle className="text-base">{floor.name}</CardTitle>
+                        <CardDescription className="text-xs">{floor.description}</CardDescription>
+                      </CardHeader>
+                    </Card>
+                  );
+                })}
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredFloors.map((floor) => (
-                  <div
-                    key={floor.id}
-                    className="cursor-pointer p-3 rounded border hover:bg-gray-100 transition-colors flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-medium">{floor.name}</div>
-                      <div className="text-xs text-gray-600">{floor.description}</div>
+                {filteredFloors.map((floor) => {
+                  const mapImage = floorMapImages[floor.id];
+                  const hasMap = floor.ugomap && mapImage;
+
+                  return (
+                    <div
+                      key={floor.id}
+                      className="cursor-pointer p-3 rounded border hover:bg-gray-100 transition-colors flex items-center gap-4"
+                    >
+                      {hasMap ? (
+                        <div className="w-24 h-16 flex-shrink-0 overflow-hidden rounded bg-gray-100">
+                          <img
+                            src={mapImage}
+                            alt={floor.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-24 h-16 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+                          <span className="text-xs text-gray-500">未登録</span>
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-medium">{floor.name}</div>
+                        <div className="text-xs text-gray-600">{floor.description}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

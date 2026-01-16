@@ -13,9 +13,14 @@ interface Floor {
   buildingId: string;
   name: string;
   description?: string;
+  ugomap?: string;
 }
 
 type SortOrder = "asc" | "desc";
+
+interface FloorMapImages {
+  [floorId: string]: string | null;
+}
 
 interface BuildingFloorContextType {
   buildings: Building[];
@@ -29,6 +34,7 @@ interface BuildingFloorContextType {
   sortOrder: SortOrder;
   setSortOrder: (order: SortOrder) => void;
   filteredBuildings: Building[];
+  floorMapImages: FloorMapImages;
 }
 
 const BuildingFloorContext = createContext<BuildingFloorContextType | undefined>(undefined);
@@ -41,6 +47,7 @@ export function BuildingFloorProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [floorMapImages, setFloorMapImages] = useState<FloorMapImages>({});
 
   // organizationIdに紐づくビル一覧を取得
   useEffect(() => {
@@ -95,6 +102,7 @@ export function BuildingFloorProvider({ children }: { children: ReactNode }) {
           buildingId: f.buildingId,
           name: f.name,
           description: `${f.type === 0 ? "フロア" : "エリア"}`,
+          ugomap: f.ugomap,
         }));
 
         setFloors(formattedFloors);
@@ -105,6 +113,61 @@ export function BuildingFloorProvider({ children }: { children: ReactNode }) {
 
     fetchFloors();
   }, [selectedBuilding?.id]);
+
+  // フロアのマップ画像を取得
+  useEffect(() => {
+    if (!selectedBuilding || floors.length === 0) {
+      setFloorMapImages({});
+      return;
+    }
+
+    const imageUrls: { [key: string]: string } = {};
+    let isMounted = true;
+
+    const fetchFloorImages = async () => {
+      const newImages: FloorMapImages = {};
+
+      for (const floor of floors) {
+        if (floor.ugomap) {
+          try {
+            const mapFileName = floor.ugomap + "_user";
+            const imgBlob = await buildingApi.getGeneralPurposeFile(
+              selectedBuilding.id,
+              "map",
+              mapFileName
+            );
+
+            if (isMounted) {
+              const imageUrl = URL.createObjectURL(imgBlob);
+              imageUrls[floor.id] = imageUrl;
+              newImages[floor.id] = imageUrl;
+            }
+          } catch (err) {
+            console.error(`Failed to fetch floor map image for ${floor.name}:`, err);
+            if (isMounted) {
+              newImages[floor.id] = null;
+            }
+          }
+        } else {
+          newImages[floor.id] = null;
+        }
+      }
+
+      if (isMounted) {
+        setFloorMapImages(newImages);
+      }
+    };
+
+    fetchFloorImages();
+
+    // クリーンアップ: URLを解放
+    return () => {
+      isMounted = false;
+      Object.values(imageUrls).forEach((url) => {
+        if (url) URL.revokeObjectURL(url);
+      });
+    };
+  }, [selectedBuilding?.id, floors.length]);
 
   const getFloorsForBuilding = (buildingId: string): Floor[] => {
     return floors.filter((floor) => floor.buildingId === buildingId);
@@ -137,6 +200,7 @@ export function BuildingFloorProvider({ children }: { children: ReactNode }) {
         sortOrder,
         setSortOrder,
         filteredBuildings,
+        floorMapImages,
       }}
     >
       {children}
