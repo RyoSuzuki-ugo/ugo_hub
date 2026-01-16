@@ -57,62 +57,10 @@ export function PlanningPage() {
 
           <TabsContent value="settings">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/map-editor")}>
-                <CardHeader>
-                  <CardTitle>マップエディタ</CardTitle>
-                  <CardDescription>マップの作成と編集</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button className="w-full" onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigate("/map-editor"); }}>
-                    開く
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Flow作成・編集</CardTitle>
-                  <CardDescription>ロボットの動作フローを設定</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">準備中</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>WorkPlan管理</CardTitle>
-                  <CardDescription>作業計画を管理</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">準備中</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>スケジュール設定</CardTitle>
-                  <CardDescription>Flowの実行スケジュールを設定</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">準備中</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>チェック項目設定</CardTitle>
-                  <CardDescription>点検項目を設定</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">準備中</p>
-                </CardContent>
-              </Card>
-
               <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/setup/initial")}>
                 <CardHeader>
-                  <CardTitle>ロボットグループ作成</CardTitle>
-                  <CardDescription>ロボットグループを作成・編集</CardDescription>
+                  <CardTitle>初期セットアップ</CardTitle>
+                  <CardDescription>組織、ビル、フロア、グループの初期設定</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button className="w-full" onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigate("/setup/initial"); }}>
@@ -131,15 +79,13 @@ export function PlanningPage() {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/setup/initial")}>
+              <Card>
                 <CardHeader>
-                  <CardTitle>初期セットアップ</CardTitle>
-                  <CardDescription>組織、ビル、フロア、グループの初期設定</CardDescription>
+                  <CardTitle>チェック項目設定</CardTitle>
+                  <CardDescription>点検項目を設定</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full" onClick={(e: React.MouseEvent) => { e.stopPropagation(); navigate("/setup/initial"); }}>
-                    開始
-                  </Button>
+                  <p className="text-sm text-muted-foreground">準備中</p>
                 </CardContent>
               </Card>
 
