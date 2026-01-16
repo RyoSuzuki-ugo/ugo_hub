@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Input } from "@repo/shared-ui/components/input";
 import { Button } from "@repo/shared-ui/components/button";
@@ -9,7 +8,6 @@ import { useBuildingFloor } from "../_contexts/BuildingFloorContext";
 type FloorViewMode = "card" | "list";
 
 export function BuildingFloorTab() {
-  const navigate = useNavigate();
   const {
     filteredBuildings,
     selectedBuilding,
@@ -34,7 +32,7 @@ export function BuildingFloorTab() {
 
   const handleOpenMapEditor = (floorId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/map-editor?floorId=${floorId}`);
+    window.open(`/map-editor/${floorId}`, '_blank', 'noopener,noreferrer');
   };
 
   // 選択されたビルの位置にスクロール

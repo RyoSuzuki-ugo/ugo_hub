@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout } from './layouts/PublicLayout';
 import { PrivateLayout } from './layouts/PrivateLayout';
+import { SimpleLayout } from './layouts/SimpleLayout';
 import { LoginPage } from './pages/public/LoginPage';
 import { DashboardPage } from './pages/private/dashboard/DashboardPage';
 import { OperatingPage } from './pages/private/operating/OperatingPage';
@@ -21,7 +22,7 @@ function App() {
         <Route index element={<Navigate to="/login" replace />} />
       </Route>
 
-      {/* Private routes */}
+      {/* Private routes with sidebar */}
       <Route element={<PrivateLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/operating" element={<OperatingPage />} />
@@ -29,9 +30,14 @@ function App() {
         <Route path="/management" element={<ManagementPage />} />
         <Route path="/system-settings" element={<SystemSettingsPage />} />
         <Route path="/setup/initial" element={<InitialSetupPage />} />
-        <Route path="/map-editor" element={<MapEditorPage />} />
         <Route path="/flow" element={<FlowPage />} />
         <Route path="/teleope" element={<TeleopePage />} />
+      </Route>
+
+      {/* Private routes without sidebar (full screen) */}
+      <Route element={<SimpleLayout />}>
+        <Route path="/map-editor" element={<MapEditorPage />} />
+        <Route path="/map-editor/:floorId" element={<MapEditorPage />} />
       </Route>
     </Routes>
   );
