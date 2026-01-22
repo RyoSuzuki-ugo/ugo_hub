@@ -8,8 +8,9 @@ import { RobotCard } from "../../../features/robot-card";
 import type { RobotData } from "../../../features/robot-card";
 
 // Mock robot data
-const robots: RobotData[] = [
+const robots: Array<RobotData & { id: string }> = [
   {
+    id: "robot-1",
     serialNo: "UM01AA-A294X0006",
     name: "ロボット A",
     status: "巡回中",
@@ -31,6 +32,7 @@ const robots: RobotData[] = [
     ],
   },
   {
+    id: "robot-2",
     serialNo: "UM01AA-A294X0006",
     name: "ロボット B",
     status: "待機中",
@@ -51,6 +53,7 @@ const robots: RobotData[] = [
     ],
   },
   {
+    id: "robot-3",
     serialNo: "UM01AA-A294X0006",
     name: "ロボット C",
     status: "充電中",
@@ -131,7 +134,7 @@ export function DashboardPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {robots.map((robot) => (
               <RobotCard
-                key={robot.serialNo}
+                key={robot.id}
                 robot={robot}
                 onOperateClick={(serialNo) => console.log(`操作画面を開く: ${serialNo}`)}
               />
