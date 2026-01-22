@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Button } from "@repo/shared-ui/components/button";
-import { ExternalLink, Palette, Layout } from "lucide-react";
+import { ExternalLink, Palette, Layout, Wifi } from "lucide-react";
 
 export function HubPage() {
   const handleOpenApp = (url: string) => {
@@ -15,7 +15,7 @@ export function HubPage() {
           <p className="text-xl text-slate-600">アプリケーションポータル</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Ugo Portal Card */}
           <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => handleOpenApp('http://localhost:4000')}>
             <CardHeader>
@@ -77,6 +77,39 @@ export function HubPage() {
                 }}
               >
                 サンプルを開く
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* WebSocket Test Card */}
+          <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => handleOpenApp('http://localhost:4003')}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                    <Wifi className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">WebSocket Test</CardTitle>
+                    <CardDescription className="text-sm mt-1">WebSocket接続テスト</CardDescription>
+                  </div>
+                </div>
+                <ExternalLink className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-600 mb-4">
+                WebSocket接続のテストとデバッグツール
+              </p>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenApp('http://localhost:4003');
+                }}
+              >
+                テストを開く
               </Button>
             </CardContent>
           </Card>

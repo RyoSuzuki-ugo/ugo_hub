@@ -1,3 +1,4 @@
+export * from './alert';
 export * from './alert-dialog';
 export * from './badge';
 export * from './button';
@@ -20,4 +21,5 @@ export * from './sidebar';
 export * from './slider';
 export * from './switch';
 export * from './tabs';
+export * from './textarea';
 export * from './tree-view';

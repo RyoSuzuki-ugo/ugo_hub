@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter ugo-portal dev",
-    "dev:all": "pnpm --filter ugo-portal dev & pnpm --filter ui-sample dev & pnpm --filter ugo-hub dev",
+    "dev:all": "pnpm --filter ugo-portal dev & pnpm --filter ui-sample dev & pnpm --filter ugo-hub dev & pnpm --filter websocket-test dev",
     "dev:ui-sample": "pnpm --filter ui-sample dev",
     "dev:hub": "pnpm --filter ugo-hub dev",
+    "dev:websocket-test": "pnpm --filter websocket-test dev",
     "build": "turbo run build",
     "start": "pnpm --filter ugo-portal start",
     "lint": "turbo run lint",
