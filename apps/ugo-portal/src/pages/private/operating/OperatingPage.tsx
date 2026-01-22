@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Button } from "@repo/shared-ui/components/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/components/tabs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Maximize2 } from "lucide-react";
 import { MultiRobotMapViewer, SensorMarker, FloorMapPlane, MapControls, MapCamera, MapLighting } from "@repo/feature";
 import type { RobotPosition } from "@repo/feature";
 import { RobotCard } from "../../../features/robot-card";
@@ -141,14 +141,20 @@ export function OperatingPage() {
   return (
     <div className="w-full h-full overflow-auto">
       <div className="p-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="outline" size="icon" onClick={() => navigate("/dashboard")}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">オペレーティング</h1>
-            <p className="text-muted-foreground">ロボットの操作と監視を行います</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" onClick={() => navigate("/dashboard")}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">オペレーティング</h1>
+              <p className="text-muted-foreground">ロボットの操作と監視を行います</p>
+            </div>
           </div>
+          <Button onClick={() => window.open("/monitoring", "_blank")} size="lg">
+            <Maximize2 className="h-4 w-4 mr-2" />
+            監視カメラ表示
+          </Button>
         </div>
 
       <Tabs defaultValue="robot" className="w-full">

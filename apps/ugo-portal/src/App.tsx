@@ -12,6 +12,7 @@ import { InitialSetupPage } from './pages/private/planning/setup/InitialSetupPag
 import { MapEditorPage } from './pages/private/planning/map-editor/MapEditorPage';
 import { FlowPage } from './pages/private/planning/flow/FlowPage';
 import { TeleopePage } from './pages/private/operating/teleope/TeleopePage';
+import { MonitoringPage } from './pages/private/monitoring/MonitoringPage';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
       <Route element={<SimpleLayout />}>
         <Route path="/map-editor" element={<MapEditorPage />} />
         <Route path="/map-editor/:floorId" element={<MapEditorPage />} />
+        <Route path="/monitoring" element={<MonitoringPage />} />
       </Route>
     </Routes>
   );

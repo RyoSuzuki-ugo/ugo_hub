@@ -1,4 +1,4 @@
-import { TrendingUp, AlertTriangle, Clock, Download } from "lucide-react";
+import { TrendingUp, AlertTriangle, Clock, Download, Maximize2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Progress } from "@repo/shared-ui/components/progress";
 import { Button } from "@repo/shared-ui/components/button";
@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/compon
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { RobotCard } from "../../../features/robot-card";
 import type { RobotData } from "../../../features/robot-card";
+import { useNavigate } from "react-router-dom";
 
 // Mock robot data
 const robots: Array<RobotData & { id: string }> = [
