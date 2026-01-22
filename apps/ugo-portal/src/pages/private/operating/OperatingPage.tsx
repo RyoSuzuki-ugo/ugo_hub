@@ -11,9 +11,10 @@ import { useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 
 // Mock robot data with full details
-const mockRobotsData: RobotData[] = [
+const mockRobotsData: Array<RobotData & { id: string }> = [
   {
-    serialNo: "UGO-2024-001",
+    id: "robot-1",
+    serialNo: "UM01AA-A294X0006",
     name: "ロボット A",
     status: "巡回中",
     statusColor: "green",
@@ -34,7 +35,8 @@ const mockRobotsData: RobotData[] = [
     ],
   },
   {
-    serialNo: "UGO-2024-002",
+    id: "robot-2",
+    serialNo: "UM01AA-A294X0006",
     name: "ロボット B",
     status: "待機中",
     statusColor: "blue",
@@ -54,7 +56,8 @@ const mockRobotsData: RobotData[] = [
     ],
   },
   {
-    serialNo: "UGO-2024-003",
+    id: "robot-3",
+    serialNo: "UM01AA-A294X0006",
     name: "ロボット C",
     status: "充電中",
     statusColor: "yellow",
@@ -74,7 +77,8 @@ const mockRobotsData: RobotData[] = [
     ],
   },
   {
-    serialNo: "UGO-2024-004",
+    id: "robot-4",
+    serialNo: "UM01AA-A294X0006",
     name: "ロボット D",
     status: "配送中",
     statusColor: "green",
@@ -97,10 +101,10 @@ const mockRobotsData: RobotData[] = [
 
 // Mock robot positions for map (4 robots on the map, scattered from center 10,10)
 const mockRobots: Array<RobotPosition & { id: string; name: string; serialNo: string }> = [
-  { id: "robot-1", name: "ロボット A", serialNo: "UGO-2024-001", x: 10, y: 10, r: 0 },
-  { id: "robot-2", name: "ロボット B", serialNo: "UGO-2024-002", x: 5, y: 15, r: Math.PI / 2 },
-  { id: "robot-3", name: "ロボット C", serialNo: "UGO-2024-003", x: 15, y: 8, r: Math.PI },
-  { id: "robot-4", name: "ロボット D", serialNo: "UGO-2024-004", x: 8, y: 12, r: -Math.PI / 4 },
+  { id: "robot-1", name: "ロボット A", serialNo: "UM01AA-A294X0006", x: 10, y: 10, r: 0 },
+  { id: "robot-2", name: "ロボット B", serialNo: "UM01AA-A294X0006", x: 5, y: 15, r: Math.PI / 2 },
+  { id: "robot-3", name: "ロボット C", serialNo: "UM01AA-A294X0006", x: 15, y: 8, r: Math.PI },
+  { id: "robot-4", name: "ロボット D", serialNo: "UM01AA-A294X0006", x: 8, y: 12, r: -Math.PI / 4 },
 ];
 
 // Mock sensor data
@@ -220,10 +224,9 @@ export function OperatingPage() {
 
             {/* Robot Card */}
             <div>
-              {mockRobotsData.find(r => r.serialNo === mockRobots.find(mr => mr.id === selectedRobotId)?.serialNo) && (
+              {mockRobotsData.find(r => r.id === selectedRobotId) && (
                 <RobotCard
-                  robot={mockRobotsData.find(r => r.serialNo === mockRobots.find(mr => mr.id === selectedRobotId)?.serialNo)!}
-                  onClick={() => {}}
+                  robot={mockRobotsData.find(r => r.id === selectedRobotId)!}
                   onOperateClick={(serialNo: string) => console.log(`操作画面を開く: ${serialNo}`)}
                 />
               )}

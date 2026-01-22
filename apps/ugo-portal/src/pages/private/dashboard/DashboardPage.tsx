@@ -4,8 +4,7 @@ import { Progress } from "@repo/shared-ui/components/progress";
 import { Button } from "@repo/shared-ui/components/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/components/tabs";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { useState } from "react";
-import { RobotCard, RobotDetailDialog } from "../../../features/robot-card";
+import { RobotCard } from "../../../features/robot-card";
 import type { RobotData } from "../../../features/robot-card";
 
 // Mock robot data
@@ -111,14 +110,6 @@ const errorFrequencyData = [
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#3b82f6'];
 
 export function DashboardPage() {
-  const [selectedRobot, setSelectedRobot] = useState<RobotData | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleRobotClick = (robot: RobotData) => {
-    setSelectedRobot(robot);
-    setIsModalOpen(true);
-  };
-
   return (
     <div className="w-full h-full overflow-auto">
       <div className="p-8">
@@ -142,18 +133,10 @@ export function DashboardPage() {
               <RobotCard
                 key={robot.serialNo}
                 robot={robot}
-                onClick={() => handleRobotClick(robot)}
                 onOperateClick={(serialNo) => console.log(`操作画面を開く: ${serialNo}`)}
               />
             ))}
           </div>
-
-          {/* Robot Detail Modal */}
-          <RobotDetailDialog
-            robot={selectedRobot}
-            open={isModalOpen}
-            onOpenChange={setIsModalOpen}
-          />
             </section>
           </TabsContent>
 
