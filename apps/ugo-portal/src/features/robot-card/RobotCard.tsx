@@ -4,10 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@repo/shared-ui/compon
 import { Button } from "@repo/shared-ui/components/button";
 import { Progress } from "@repo/shared-ui/components/progress";
 import { Activity, Wifi } from "lucide-react";
-import { SkywayRoom } from "@repo/feature";
+import { WebSocketImageStream } from "@repo/websocket-client";
 import type { RobotData } from "./types";
-
-const serialNo = "UM01AA-A294X0006";
 
 interface RobotCardProps {
   robot: RobotData;
@@ -52,18 +50,17 @@ export function RobotCard({ robot, onClick, onOperateClick }: RobotCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Skyway Streaming Video */}
+        {/* WebSocket Image Streaming */}
         <div className="w-full aspect-video bg-black rounded-md overflow-hidden">
-          <SkywayRoom
-            channelName={serialNo}
-            autoJoin
+          <WebSocketImageStream
+            serialNo={robot.serialNo}
+            autoConnect
             fullScreen={false}
-            showSettings={false}
             onConnectionChange={(connected: boolean) => {
-              console.log("SkywayRoom Connection status:", connected);
+              console.log("WebSocket Image Stream Connection status:", connected);
             }}
-            onError={(error: unknown) => {
-              console.error("SkywayRoom error:", error);
+            onError={(error: Error) => {
+              console.error("WebSocket Image Stream error:", error);
             }}
           />
         </div>

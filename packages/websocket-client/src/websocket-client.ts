@@ -23,7 +23,7 @@ export class WebSocketClient {
     realm: 'robot' | 'operator' | 'service';
     token: string;
     socket?: WebSocket;
-  }): Promise<WebSocketClient> {
+  }): Promise<RobotClient | UserClient> {
     return new Promise((resolve, reject) => {
       const ws = options.socket ?? new WebSocket(options.url);
 

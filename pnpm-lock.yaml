@@ -75,6 +75,9 @@ importers:
       '@repo/shared-ui':
         specifier: workspace:*
         version: link:../../packages/shared-ui
+      '@repo/websocket-client':
+        specifier: workspace:*
+        version: link:../../packages/websocket-client
       lucide-react:
         specifier: ^0.544.0
         version: 0.544.0(react@19.2.3)

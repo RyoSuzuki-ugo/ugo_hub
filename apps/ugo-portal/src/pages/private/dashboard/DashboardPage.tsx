@@ -11,7 +11,7 @@ import type { RobotData } from "../../../features/robot-card";
 // Mock robot data
 const robots: RobotData[] = [
   {
-    serialNo: "UGO-2024-001",
+    serialNo: "UM01AA-A294X0006",
     name: "ロボット A",
     status: "巡回中",
     statusColor: "green",
@@ -32,7 +32,7 @@ const robots: RobotData[] = [
     ],
   },
   {
-    serialNo: "UGO-2024-002",
+    serialNo: "UM01AA-A294X0006",
     name: "ロボット B",
     status: "待機中",
     statusColor: "blue",
@@ -52,7 +52,7 @@ const robots: RobotData[] = [
     ],
   },
   {
-    serialNo: "UGO-2024-003",
+    serialNo: "UM01AA-A294X0006",
     name: "ロボット C",
     status: "充電中",
     statusColor: "yellow",

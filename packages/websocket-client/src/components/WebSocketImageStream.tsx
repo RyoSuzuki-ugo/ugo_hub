@@ -5,29 +5,29 @@ import { UserClient } from "../websocket-client";
 import { getWebSocketEndpoint } from "../utils";
 
 export interface WebSocketImageStreamProps {
-  /** íÜÃÈn·ê¢ëj÷ */
+  /** Robot serial number */
   serialNo: string;
-  /** ü­Y‹ÈÔÃ¯ (ÇÕ©ëÈ: websocket.cmd.interval) */
+  /** Topic to subscribe (default: websocket.cmd.interval) */
   topic?: string;
-  /** ¤ó¿üĞë®qn“”Ò	 (ÇÕ©ëÈ: 1) */
+  /** Interval shooting interval in seconds (default: 1) */
   intervalSec?: number;
-  /** «áéID (ÇÕ©ëÈ: "1") */
+  /** Camera ID (default: "1") */
   cameraId?: string;
-  /** ®q¿ü²ÃÈ (ÇÕ©ëÈ: "default") */
+  /** Shooting target (default: "default") */
   target?: string;
-  /** <Èü¯óšWjD4olocalStorageK‰Ö—	 */
+  /** Authentication token (retrieved from localStorage if not specified) */
   token?: string;
-  /** êÕ¥šY‹K (ÇÕ©ëÈ: true) */
+  /** Whether to auto-connect (default: true) */
   autoConnect?: boolean;
-  /** Õë¹¯êüóh: (ÇÕ©ëÈ: true) */
+  /** Full screen display (default: true) */
   fullScreen?: boolean;
-  /** ı n¯é¹ */
+  /** Additional class name */
   className?: string;
-  /** ı n¹¿¤ë */
+  /** Additional style */
   style?: React.CSSProperties;
-  /** ¥š¶K	ôBn³üëĞÃ¯ */
+  /** Callback on connection state change */
   onConnectionChange?: (connected: boolean) => void;
-  /** ¨éüzBn³üëĞÃ¯ */
+  /** Callback on error */
   onError?: (error: Error) => void;
 }
 
@@ -60,13 +60,13 @@ export default function WebSocketImageStream({
 
     setConnecting(true);
     try {
-      // Èü¯ó’Ö—
+      // Get token
       const token = providedToken || localStorage.getItem("user-token");
       if (!token) {
         throw new Error("user-token not found");
       }
 
-      // WebSocket¥š
+      // WebSocket connection
       const wsUrl = getWebSocketEndpoint();
       console.log(`[WS Image Stream] Connecting to ${wsUrl}`);
 
@@ -79,7 +79,7 @@ export default function WebSocketImageStream({
       wsClientRef.current = client;
       console.log("[WS Image Stream] WebSocket connected successfully");
 
-      // áÃ»ü¸ÏóÉéü{2
+      // Register message handler
       client.on("message", (data: string) => {
         try {
           const message = JSON.parse(data);
@@ -89,7 +89,7 @@ export default function WebSocketImageStream({
             message.topic === topic &&
             message.robot_serial_no === serialNo
           ) {
-            // base64;Ï’h:
+            // Display base64 image
             if (message.data && message.data.base64) {
               if (imageAreaRef.current) {
                 imageAreaRef.current.style.backgroundImage = `url(data:image/jpeg;base64,${message.data.base64})`;
@@ -125,11 +125,11 @@ export default function WebSocketImageStream({
         onConnectionChange?.(false);
       });
 
-      // ÈÔÃ¯’ü­
+      // Subscribe to topic
       client.subscribe([topic], serialNo);
       console.log(`[WS Image Stream] Subscribed to ${topic}`);
 
-      // ¤ó¿üĞë®q‹Ë³ŞóÉ’á
+      // Send interval shooting start command
       const command = {
         cmd: "start_interval_stream",
         target,
@@ -165,7 +165,7 @@ export default function WebSocketImageStream({
   const disconnect = useCallback(async () => {
     if (wsClientRef.current) {
       try {
-        // \b³ŞóÉ’á
+        // Send stop command
         const command = {
           cmd: "stop_interval_stream",
           target,
@@ -174,11 +174,11 @@ export default function WebSocketImageStream({
         wsClientRef.current.executeActionCommand(serialNo, command);
         console.log("[WS Image Stream] Sent stop_interval_stream command");
 
-        // ü­ãd
+        // Unsubscribe
         wsClientRef.current.unsubscribe([topic], serialNo);
         console.log(`[WS Image Stream] Unsubscribed from ${topic}`);
 
-        // ¥š’‰X‹
+        // Close connection
         wsClientRef.current.close();
         wsClientRef.current = null;
       } catch (error) {
@@ -186,7 +186,7 @@ export default function WebSocketImageStream({
       }
     }
 
-    // ;Ïh:’¯ê¢
+    // Clear image display
     if (imageAreaRef.current) {
       imageAreaRef.current.style.backgroundImage = "";
     }
@@ -196,7 +196,7 @@ export default function WebSocketImageStream({
     onConnectionChange?.(false);
   }, [serialNo, topic, target, cameraId, onConnectionChange]);
 
-  // êÕ¥š
+  // Auto connect
   useEffect(() => {
     if (autoConnect && !connected && !connecting) {
       const timer = setTimeout(() => {
@@ -206,7 +206,7 @@ export default function WebSocketImageStream({
     }
   }, [autoConnect, connected, connecting, connect]);
 
-  // ¯êüó¢Ã×
+  // Cleanup
   useEffect(() => {
     return () => {
       disconnect();
@@ -229,7 +229,7 @@ export default function WebSocketImageStream({
       className={`relative bg-black overflow-hidden ${className}`}
       style={{ ...containerStyle, ...style }}
     >
-      {/* ;Ïh:¨ê¢ */}
+      {/* Image display area */}
       <div
         ref={imageAreaRef}
         className="w-full h-full bg-black relative"
@@ -237,29 +237,28 @@ export default function WebSocketImageStream({
           transition: "background-image 0.3s ease-in-out",
         }}
       >
-        {/* …_áÃ»ü¸ */}
+        {/* Waiting message */}
         {!hasImage && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="text-white text-center space-y-4">
               <div className="text-xl mb-4">
-                {serialNo};Ï×á…_-...
+                {serialNo}: Waiting for image...
               </div>
               <div className="flex justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid border-gray-700"></div>
               </div>
               {connecting && (
-                <div className="text-sm text-gray-400">¥š-...</div>
+                <div className="text-sm text-gray-400">Connecting...</div>
               )}
             </div>
           </div>
         )}
       </div>
 
-      {/* ¥š¶K¤ó¸±ü¿üó
-	 */}
+      {/* Connection status indicator (top right) */}
       {connected && (
         <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg z-20">
-          ¥š-
+          Connected
         </div>
       )}
     </div>

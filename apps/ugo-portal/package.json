@@ -16,6 +16,7 @@
     "@repo/design-system": "workspace:*",
     "@repo/feature": "workspace:*",
     "@repo/shared-ui": "workspace:*",
+    "@repo/websocket-client": "workspace:*",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

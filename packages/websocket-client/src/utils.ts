@@ -1,7 +1,7 @@
 export type Environment = 'LOCAL' | 'DEBUG' | 'DEV' | 'TEST' | 'STG' | 'PROD';
 
 /**
- * þ(n°ƒ’Ö—
+ * ï¿½(nï¿½ï¿½ï¿½Ö—
  */
 export function getEnvironment(): Environment {
   const hostname = window.location.hostname;
@@ -13,7 +13,7 @@ export function getEnvironment(): Environment {
 }
 
 /**
- * °ƒkÜX_WebSocket¨óÉÝ¤óÈ’Ö—
+ * ï¿½ï¿½kï¿½X_WebSocketï¿½ï¿½ï¿½Ý¤ï¿½È’Ö—
  */
 export function getWebSocketEndpoint(env?: Environment): string {
   const environment = env || getEnvironment();
@@ -27,7 +27,7 @@ export function getWebSocketEndpoint(env?: Environment): string {
       return 'wss://gateway-dev.ugo.works/stream/stream';
     case 'DEBUG':
     case 'LOCAL':
-      return 'ws://localhost:3001/stream/stream';
+      return 'wss://gateway-dev.ugo.works/stream/stream';
     default: // PROD
       return 'wss://gateway.ugo.works/stream/stream';
   }

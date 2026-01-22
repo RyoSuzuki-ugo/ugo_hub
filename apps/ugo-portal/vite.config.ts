@@ -11,6 +11,7 @@ export default defineConfig({
       '@repo/api-client': path.resolve(__dirname, '../../packages/api-client/src'),
       '@repo/shared-ui': path.resolve(__dirname, '../../packages/shared-ui/src'),
       '@repo/design-system': path.resolve(__dirname, '../../packages/design-system/src'),
+      '@repo/websocket-client': path.resolve(__dirname, '../../packages/websocket-client/src'),
     },
   },
   server: {
