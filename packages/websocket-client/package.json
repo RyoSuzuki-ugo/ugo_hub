@@ -13,8 +13,12 @@
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/react": "^19",
     "typescript": "^5"
   }
 }

@@ -405,10 +405,17 @@ importers:
         version: 5.9.3
 
   packages/websocket-client:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.2.3
     devDependencies:
       '@types/node':
         specifier: ^22
         version: 22.19.7
+      '@types/react':
+        specifier: ^19
+        version: 19.2.7
       typescript:
         specifier: ^5
         version: 5.9.3
