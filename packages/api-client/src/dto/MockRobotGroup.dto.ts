@@ -1,16 +1,16 @@
 import { Building } from "./Building.dto";
 import { Robot } from "./Robot.dto";
 
-export interface RobotGroup {
+export interface MockRobotGroup {
   id?: string;
   index: number;
   name: string;
   buildingId: string;
 }
 
-export interface RobotGroupRelations {
+export interface MockRobotGroupRelations {
   building?: Building;
   robots?: Robot[];
 }
 
-export type RobotGroupWithRelations = RobotGroup & RobotGroupRelations;
+export type MockRobotGroupWithRelations = MockRobotGroup & MockRobotGroupRelations;
