@@ -6,98 +6,9 @@ import { ArrowLeft, Maximize2 } from "lucide-react";
 import { MultiRobotMapViewer, SensorMarker, FloorMapPlane, MapControls, MapCamera, MapLighting } from "@repo/feature";
 import type { RobotPosition } from "@repo/feature";
 import { RobotCard } from "../../../features/robot-card";
-import type { RobotData } from "../../../features/robot-card";
+import { mockRobotsData } from "../../../data/mockRobots";
 import { useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-
-// Mock robot data with full details
-const mockRobotsData: Array<RobotData & { id: string }> = [
-  {
-    id: "robot-1",
-    serialNo: "UM01AA-A294X0006",
-    name: "ロボット A",
-    status: "巡回中",
-    statusColor: "green",
-    currentFlow: "定期巡回点検",
-    location: "3F 東エリア",
-    building: "本社ビル",
-    battery: 78,
-    batteryTime: "約4.2時間",
-    communication: "良好",
-    wifiStrength: "-42 dBm",
-    todayCompletion: 92,
-    todayCompleted: 46,
-    todayPending: 4,
-    schedule: [
-      { time: "14:30", flow: "定期配送" },
-      { time: "16:00", flow: "夕方巡回点検" },
-      { time: "18:00", flow: "充電" },
-    ],
-  },
-  {
-    id: "robot-2",
-    serialNo: "UM01AA-A294X0006",
-    name: "ロボット B",
-    status: "待機中",
-    statusColor: "blue",
-    currentFlow: "-",
-    location: "1F 充電ステーション",
-    building: "本社ビル",
-    battery: 95,
-    batteryTime: "約5.1時間",
-    communication: "良好",
-    wifiStrength: "-38 dBm",
-    todayCompletion: 88,
-    todayCompleted: 38,
-    todayPending: 5,
-    schedule: [
-      { time: "15:00", flow: "配送業務" },
-      { time: "17:30", flow: "巡回点検" },
-    ],
-  },
-  {
-    id: "robot-3",
-    serialNo: "UM01AA-A294X0006",
-    name: "ロボット C",
-    status: "充電中",
-    statusColor: "yellow",
-    currentFlow: "-",
-    location: "2F 充電ステーション",
-    building: "本社ビル",
-    battery: 45,
-    batteryTime: "約2.4時間",
-    communication: "良好",
-    wifiStrength: "-45 dBm",
-    todayCompletion: 95,
-    todayCompleted: 52,
-    todayPending: 3,
-    schedule: [
-      { time: "15:30", flow: "監視業務" },
-      { time: "17:00", flow: "清掃" },
-    ],
-  },
-  {
-    id: "robot-4",
-    serialNo: "UM01AA-A294X0006",
-    name: "ロボット D",
-    status: "配送中",
-    statusColor: "green",
-    currentFlow: "オフィス配送",
-    location: "4F 西エリア",
-    building: "本社ビル",
-    battery: 62,
-    batteryTime: "約3.3時間",
-    communication: "良好",
-    wifiStrength: "-48 dBm",
-    todayCompletion: 85,
-    todayCompleted: 34,
-    todayPending: 6,
-    schedule: [
-      { time: "14:00", flow: "書類配送" },
-      { time: "16:30", flow: "清掃業務" },
-    ],
-  },
-];
 
 // Mock robot positions for map (4 robots on the map, scattered from center 10,10)
 const mockRobots: Array<RobotPosition & { id: string; name: string; serialNo: string }> = [

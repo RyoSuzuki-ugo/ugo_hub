@@ -1,80 +1,11 @@
-import { TrendingUp, AlertTriangle, Clock, Download, Maximize2 } from "lucide-react";
+import { TrendingUp, AlertTriangle, Clock, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Progress } from "@repo/shared-ui/components/progress";
 import { Button } from "@repo/shared-ui/components/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/components/tabs";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { RobotCard } from "../../../features/robot-card";
-import type { RobotData } from "../../../features/robot-card";
-import { useNavigate } from "react-router-dom";
-
-// Mock robot data
-const robots: Array<RobotData & { id: string }> = [
-  {
-    id: "robot-1",
-    serialNo: "UM01AA-A294X0006",
-    name: "ロボット A",
-    status: "巡回中",
-    statusColor: "green",
-    currentFlow: "定期巡回点検",
-    location: "3F 東エリア",
-    building: "本社ビル",
-    battery: 78,
-    batteryTime: "約4.2時間",
-    communication: "良好",
-    wifiStrength: "-42 dBm",
-    todayCompletion: 92,
-    todayCompleted: 46,
-    todayPending: 4,
-    schedule: [
-      { time: "14:30", flow: "定期配送" },
-      { time: "16:00", flow: "夕方巡回点検" },
-      { time: "18:00", flow: "充電" },
-    ],
-  },
-  {
-    id: "robot-2",
-    serialNo: "UM01AA-A294X0006",
-    name: "ロボット B",
-    status: "待機中",
-    statusColor: "blue",
-    currentFlow: "-",
-    location: "1F 充電ステーション",
-    building: "本社ビル",
-    battery: 95,
-    batteryTime: "約5.1時間",
-    communication: "良好",
-    wifiStrength: "-38 dBm",
-    todayCompletion: 88,
-    todayCompleted: 38,
-    todayPending: 5,
-    schedule: [
-      { time: "15:00", flow: "配送業務" },
-      { time: "17:30", flow: "巡回点検" },
-    ],
-  },
-  {
-    id: "robot-3",
-    serialNo: "UM01AA-A294X0006",
-    name: "ロボット C",
-    status: "充電中",
-    statusColor: "yellow",
-    currentFlow: "-",
-    location: "2F 充電ステーション",
-    building: "本社ビル",
-    battery: 45,
-    batteryTime: "約2.4時間",
-    communication: "良好",
-    wifiStrength: "-45 dBm",
-    todayCompletion: 95,
-    todayCompleted: 52,
-    todayPending: 3,
-    schedule: [
-      { time: "15:30", flow: "監視業務" },
-      { time: "17:00", flow: "清掃" },
-    ],
-  },
-];
+import { mockRobotsData } from "../../../data/mockRobots";
 
 // Mock data
 const flowCompletionData = [
@@ -133,7 +64,7 @@ export function DashboardPage() {
 
           {/* Robot Grid View */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {robots.map((robot) => (
+            {mockRobotsData.map((robot) => (
               <RobotCard
                 key={robot.id}
                 robot={robot}
