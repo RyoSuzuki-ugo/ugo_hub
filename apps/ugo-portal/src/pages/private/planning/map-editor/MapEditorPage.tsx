@@ -24,11 +24,18 @@ import {
   MapLighting,
 } from "@repo/feature";
 import { MapEditorProvider, useMapEditor, type Destination } from "./_contexts/MapEditorContext";
+import { CommandSelectionDialog } from "../../../../features/command-selection-dialog";
+import type { CommandDef } from "@repo/api-client";
+import { mockCommandDefs } from "../../../../data/mockCommandDefs";
+import { useMemo } from "react";
 
 function MapEditorContent() {
   const navigate = useNavigate();
   const [commandDialogOpen, setCommandDialogOpen] = useState(false);
   const [selectedDestForCommand, setSelectedDestForCommand] = useState<Destination | null>(null);
+  const [commandSelectionDialogOpen, setCommandSelectionDialogOpen] = useState(false);
+  const [pendingDestination, setPendingDestination] = useState<Destination | null>(null);
+  const [isAddingToExistingDest, setIsAddingToExistingDest] = useState(false);
   const {
     mapImageUrl,
     showRobot,
@@ -41,14 +48,111 @@ function MapEditorContent() {
     floor,
     loading,
     destinations,
+    setDestinations,
     selectedDestinationId,
     setSelectedDestinationId,
+    mapPointCommands,
+    setMapPointCommands,
   } = useMapEditor();
+
+  // 選択された目的地に紐づくコマンドを取得
+  const selectedDestCommands = useMemo(() => {
+    if (!selectedDestForCommand) return [];
+
+    const destMapPointCommands = mapPointCommands
+      .filter(mpc => mpc.mapPointId === selectedDestForCommand.id)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    return destMapPointCommands.map(mpc => {
+      const commandDef = mockCommandDefs.find(cmd => cmd.id === mpc.commandDefId);
+      return {
+        id: mpc.id!,
+        name: commandDef?.name || "不明なコマンド",
+        order: (mpc.order || 0) + 1,
+      };
+    });
+  }, [selectedDestForCommand, mapPointCommands]);
 
   // 選択された目的地の座標を取得
   const selectedDestination = destinations.find(
     (d) => d.id === selectedDestinationId
   );
+
+  // 目的地を追加
+  const handleAddDestination = () => {
+    const newId = `dest-${destinations.length + 1}`;
+    const baseX = 10;
+    const baseY = 10;
+    const offset = destinations.length;
+
+    // 回転角を0, π/2, π, 3π/2でローテーション
+    const rotations = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
+    const rotation = rotations[destinations.length % 4];
+
+    const newDestination: Destination = {
+      id: newId,
+      name: `目的地 ${String.fromCharCode(65 + destinations.length)}`,
+      x: baseX + offset,
+      y: baseY + offset,
+      r: rotation,
+      commands: [],
+    };
+
+    setPendingDestination(newDestination);
+    setCommandSelectionDialogOpen(true);
+  };
+
+  // コマンド選択完了時
+  const handleCommandSelect = (commands: CommandDef[]) => {
+    if (isAddingToExistingDest && selectedDestForCommand) {
+      // 既存の目的地にコマンドを追加
+      const currentCommands = mapPointCommands.filter(
+        mpc => mpc.mapPointId === selectedDestForCommand.id
+      );
+      const startOrder = currentCommands.length;
+
+      const newMapPointCommands = commands.map((cmd, index) => ({
+        id: `mpc-${selectedDestForCommand.id}-${Date.now()}-${index}`,
+        mapPointId: selectedDestForCommand.id,
+        commandDefId: cmd.id!,
+        order: startOrder + index,
+      }));
+
+      setMapPointCommands([...mapPointCommands, ...newMapPointCommands]);
+      setIsAddingToExistingDest(false);
+    } else if (pendingDestination) {
+      // 新しい目的地を追加
+      setDestinations([...destinations, pendingDestination]);
+      setSelectedDestinationId(pendingDestination.id);
+
+      // MockMapPointCommandを作成
+      const newMapPointCommands = commands.map((cmd, index) => ({
+        id: `mpc-${pendingDestination.id}-${index}`,
+        mapPointId: pendingDestination.id,
+        commandDefId: cmd.id!,
+        order: index,
+      }));
+
+      setMapPointCommands([...mapPointCommands, ...newMapPointCommands]);
+      setPendingDestination(null);
+    }
+  };
+
+  // 既存の目的地にコマンドを追加
+  const handleAddCommandToExistingDest = () => {
+    setIsAddingToExistingDest(true);
+    setCommandDialogOpen(false);
+    setCommandSelectionDialogOpen(true);
+  };
+
+  // コマンド選択をスキップ（目的地のみ追加）
+  const handleSkipCommandSelection = () => {
+    if (pendingDestination) {
+      setDestinations([...destinations, pendingDestination]);
+      setSelectedDestinationId(pendingDestination.id);
+      setPendingDestination(null);
+    }
+  };
 
   return (
     <div className="w-full h-screen flex flex-col">
@@ -112,7 +216,7 @@ function MapEditorContent() {
             <div className="p-4 border-b bg-muted/30">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">目的地</h3>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={handleAddDestination}>
                   + 追加
                 </Button>
               </div>
@@ -220,29 +324,50 @@ function MapEditorContent() {
 
       {/* コマンド設定ダイアログ */}
       <Dialog open={commandDialogOpen} onOpenChange={setCommandDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>
               {selectedDestForCommand?.name} - コマンド一覧
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {selectedDestForCommand?.commands?.map((cmd) => (
-              <div
-                key={cmd.id}
-                className="p-3 border rounded-lg hover:bg-gray-50"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-semibold">
-                    {cmd.order}
-                  </div>
-                  <div className="flex-1 font-medium">{cmd.name}</div>
-                </div>
+          <div className="space-y-2 overflow-y-auto flex-1">
+            {selectedDestCommands.length === 0 ? (
+              <div className="text-center py-8 text-sm text-muted-foreground">
+                コマンドが設定されていません
               </div>
-            ))}
+            ) : (
+              selectedDestCommands.map((cmd) => (
+                <div
+                  key={cmd.id}
+                  className="p-3 border rounded-lg hover:bg-gray-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-semibold">
+                      {cmd.order}
+                    </div>
+                    <div className="flex-1 font-medium">{cmd.name}</div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <div className="flex justify-end pt-4 border-t">
+            <Button onClick={handleAddCommandToExistingDest}>
+              + コマンド追加
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* コマンド選択ダイアログ（目的地追加時） */}
+      <CommandSelectionDialog
+        open={commandSelectionDialogOpen}
+        onOpenChange={setCommandSelectionDialogOpen}
+        onSelect={handleCommandSelect}
+        onSkip={handleSkipCommandSelection}
+        destinationName={pendingDestination?.name}
+        showSkipButton={!isAddingToExistingDest}
+      />
     </div>
   );
 }

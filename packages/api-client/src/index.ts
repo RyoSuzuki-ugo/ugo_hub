@@ -59,6 +59,10 @@ export type {
   WordToken,
   WordStats,
 } from "./dto/AgentChatAnalytics.dto";
+export type {
+  MockMapPointCommandDto,
+  MockMapPointCommandWithRelationsDto,
+} from "./dto/MockMapPointCommand.dto";
 
 // Services
 export { operatorService } from "./services/OperatorService";
