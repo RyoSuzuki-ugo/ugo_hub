@@ -32,10 +32,12 @@ import { RoutesSidebar } from "./_components/RoutesSidebar";
 import { FlowEditorSidebar } from "./_components/FlowEditorSidebar";
 import { DestinationNameDialog } from "./_components/DestinationNameDialog";
 import { FlowNameDialog } from "./_components/FlowNameDialog";
+import { CommandGroupDialog } from "./_components/CommandGroupDialog";
 import type { CommandDef } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../data/mockCommandDefs";
 import { mockDestinations, mockFlows, mockMapPointCommandsData } from "../../../../data/mockMapData";
 import { useMemo } from "react";
+import type { FlowCommandGroup } from "./_contexts/MapEditorContext";
 
 function MapEditorContent() {
   const navigate = useNavigate();
@@ -62,6 +64,7 @@ function MapEditorContent() {
   const [isFlowSidebarMinimized, setIsFlowSidebarMinimized] = useState(false);
   const [flowNameDialogOpen, setFlowNameDialogOpen] = useState(false);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [commandGroupDialogOpen, setCommandGroupDialogOpen] = useState(false);
   const {
     mapImageUrl,
     showRobot,
@@ -209,7 +212,7 @@ function MapEditorContent() {
     const newFlow: Flow = {
       id: `flow-${flows.length + 1}`,
       name,
-      destinations: [],
+      items: [],
     };
     setFlows([...flows, newFlow]);
     setSelectedFlowId(newFlow.id);
@@ -221,6 +224,29 @@ function MapEditorContent() {
     setFlows(mockFlows);
     setMapPointCommands(mockMapPointCommandsData);
     setSelectedFlowId(null);
+  };
+
+  // コマンドグループ追加
+  const handleAddCommandGroup = () => {
+    if (!selectedFlowId) return;
+    setCommandGroupDialogOpen(true);
+  };
+
+  // コマンドグループ作成
+  const handleCreateCommandGroup = (name: string, commandIds: string[]) => {
+    if (!selectedFlowId) return;
+
+    const newGroup: FlowCommandGroup = {
+      id: `cmdgroup-${Date.now()}`,
+      name,
+      commands: commandIds,
+    };
+
+    setFlows(flows.map(flow =>
+      flow.id === selectedFlowId
+        ? { ...flow, items: [...flow.items, { type: 'commandGroup', commandGroup: newGroup }] }
+        : flow
+    ));
   };
 
   // ドラッグ&ドロップのセンサー設定
@@ -256,34 +282,42 @@ function MapEditorContent() {
 
         if (targetFlow) {
           // 既に追加されていないかチェック
-          const alreadyExists = targetFlow.destinations.some(d => d.id === destination.id);
+          const alreadyExists = targetFlow.items.some(
+            item => item.type === 'destination' && item.destination.id === destination.id
+          );
 
           if (!alreadyExists) {
             setFlows(flows.map(flow =>
               flow.id === flowId
-                ? { ...flow, destinations: [...flow.destinations, destination] }
+                ? { ...flow, items: [...flow.items, { type: 'destination', destination }] }
                 : flow
             ));
           }
         }
       }
     }
-    // フロー内での地点の並び替え
+    // フロー内でのアイテムの並び替え（地点とコマンドグループの混在）
     else if (selectedFlowId && active.id !== over.id) {
       const selectedFlow = flows.find(f => f.id === selectedFlowId);
 
       if (selectedFlow) {
-        const oldIndex = selectedFlow.destinations.findIndex((dest) => dest.id === active.id);
-        const newIndex = selectedFlow.destinations.findIndex((dest) => dest.id === over.id);
+        const oldIndex = selectedFlow.items.findIndex(item =>
+          (item.type === 'destination' && item.destination.id === active.id) ||
+          (item.type === 'commandGroup' && item.commandGroup.id === active.id)
+        );
+        const newIndex = selectedFlow.items.findIndex(item =>
+          (item.type === 'destination' && item.destination.id === over.id) ||
+          (item.type === 'commandGroup' && item.commandGroup.id === over.id)
+        );
 
         if (oldIndex !== -1 && newIndex !== -1) {
-          const newDestinations = [...selectedFlow.destinations];
-          const [movedItem] = newDestinations.splice(oldIndex, 1);
-          newDestinations.splice(newIndex, 0, movedItem);
+          const newItems = [...selectedFlow.items];
+          const [movedItem] = newItems.splice(oldIndex, 1);
+          newItems.splice(newIndex, 0, movedItem);
 
           setFlows(flows.map(flow =>
             flow.id === selectedFlowId
-              ? { ...flow, destinations: newDestinations }
+              ? { ...flow, items: newItems }
               : flow
           ));
           return;
@@ -635,6 +669,7 @@ function MapEditorContent() {
                 mapPointCommands={mapPointCommands}
                 selectedFlowId={selectedFlowId}
                 onSelectFlow={setSelectedFlowId}
+                onAddCommandGroup={handleAddCommandGroup}
               />
             </div>
           )}
@@ -701,6 +736,13 @@ function MapEditorContent() {
         open={flowNameDialogOpen}
         onOpenChange={setFlowNameDialogOpen}
         onConfirm={handleCreateFlow}
+      />
+
+      {/* コマンドグループ追加ダイアログ */}
+      <CommandGroupDialog
+        open={commandGroupDialogOpen}
+        onOpenChange={setCommandGroupDialogOpen}
+        onConfirm={handleCreateCommandGroup}
       />
 
       {/* 新規マップ作成ダイアログ */}

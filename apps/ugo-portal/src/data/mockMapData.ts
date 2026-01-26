@@ -42,12 +42,12 @@ export const mockFlows: Flow[] = [
   {
     id: "flow-mock-1",
     name: "標準点検フロー",
-    destinations: [],
+    items: [],
   },
   {
     id: "flow-mock-2",
     name: "充電フロー",
-    destinations: [],
+    items: [],
   },
 ];
 

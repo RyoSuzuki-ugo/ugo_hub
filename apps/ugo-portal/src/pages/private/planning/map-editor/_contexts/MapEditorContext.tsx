@@ -18,10 +18,20 @@ export interface Destination {
   commands?: Command[];
 }
 
+export interface FlowCommandGroup {
+  id: string;
+  name: string;
+  commands: string[]; // CommandDef の id の配列
+}
+
+export type FlowItem =
+  | { type: 'destination'; destination: Destination }
+  | { type: 'commandGroup'; commandGroup: FlowCommandGroup };
+
 export interface Flow {
   id: string;
   name: string;
-  destinations: Destination[];
+  items: FlowItem[]; // 地点とコマンドグループを混在させて順番管理
 }
 
 interface MapEditorContextType {
