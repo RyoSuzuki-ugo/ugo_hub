@@ -624,7 +624,7 @@ function MapEditorContent() {
 
         <div className="flex flex-1 overflow-hidden relative">
         {/* メインキャンバス - 3D地図 */}
-        <div className="flex-1">
+        <div className="flex-1 relative" style={{ zIndex: 0 }}>
           <Canvas
             orthographic
             camera={{ position: [0, 10, 0], zoom: cameraZoom }}

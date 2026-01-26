@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,7 @@ import { Button } from "@repo/shared-ui/components/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/components/tabs";
 import { mockCommandDefs } from "../../data/mockCommandDefs";
 import { mockCommandDefTemplates } from "../../data/mockCommandDefTemplates";
+import { mockCommandCategories } from "../../data/mockCommandCategories";
 import type { CommandDef } from "@repo/api-client/dto/CommandDef.dto";
 import type { MockCommandDefTemplateDto } from "@repo/api-client/dto/MockCommandDefTemplate.dto";
 
@@ -22,6 +23,8 @@ interface CommandSelectionDialogProps {
   showSkipButton?: boolean;
 }
 
+type CommandCategoryType = "pickup" | "favorite" | "all";
+
 export function CommandSelectionDialog({
   open,
   onOpenChange,
@@ -32,6 +35,17 @@ export function CommandSelectionDialog({
 }: CommandSelectionDialogProps) {
   const [selectedCommands, setSelectedCommands] = useState<Set<string>>(new Set());
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [commandCategory, setCommandCategory] = useState<CommandCategoryType>("pickup");
+
+  // カテゴリごとのコマンドリストを取得
+  const filteredCommands = useMemo(() => {
+    if (commandCategory === "pickup") {
+      return mockCommandDefs.filter(cmd => mockCommandCategories.pickup.includes(cmd.id!));
+    } else if (commandCategory === "favorite") {
+      return mockCommandDefs.filter(cmd => mockCommandCategories.favorite.includes(cmd.id!));
+    }
+    return mockCommandDefs;
+  }, [commandCategory]);
 
   const handleCommandToggle = (commandId: string) => {
     const newSelected = new Set(selectedCommands);
@@ -62,19 +76,38 @@ export function CommandSelectionDialog({
     }
 
     onSelect(commandsToAdd);
+    resetState();
+    onOpenChange(false);
+  };
+
+  const resetState = () => {
     setSelectedCommands(new Set());
     setSelectedTemplate(null);
-    onOpenChange(false);
+    setCommandCategory("pickup");
   };
 
   const handleCancel = () => {
-    setSelectedCommands(new Set());
-    setSelectedTemplate(null);
+    resetState();
     onOpenChange(false);
   };
 
+  const handleSkip = () => {
+    if (onSkip) {
+      onSkip();
+      resetState();
+      onOpenChange(false);
+    }
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      resetState();
+    }
+    onOpenChange(newOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>
@@ -120,30 +153,46 @@ export function CommandSelectionDialog({
             ))}
           </TabsContent>
 
-          <TabsContent value="individual" className="space-y-2 max-h-96 overflow-y-auto">
-            {mockCommandDefs.map((cmd) => (
-              <div
-                key={cmd.id}
-                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                  selectedCommands.has(cmd.id!)
-                    ? "bg-primary/10 border-primary"
-                    : "hover:bg-gray-50"
-                }`}
-                onClick={() => handleCommandToggle(cmd.id!)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="font-medium">{cmd.name}</div>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      {cmd.desc}
+          <TabsContent value="individual" className="space-y-3">
+            {/* カテゴリタブ */}
+            <Tabs value={commandCategory} onValueChange={(v) => setCommandCategory(v as CommandCategoryType)}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="pickup">ピックアップ</TabsTrigger>
+                <TabsTrigger value="favorite">お気に入り</TabsTrigger>
+                <TabsTrigger value="all">全て</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value={commandCategory} className="space-y-2 max-h-80 overflow-y-auto mt-2">
+                {filteredCommands.map((cmd) => (
+                  <div
+                    key={cmd.id}
+                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                      selectedCommands.has(cmd.id!)
+                        ? "bg-primary/10 border-primary"
+                        : "hover:bg-gray-50"
+                    }`}
+                    onClick={() => handleCommandToggle(cmd.id!)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="font-medium">{cmd.name}</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {cmd.desc}
+                        </div>
+                      </div>
+                      {selectedCommands.has(cmd.id!) && (
+                        <div className="text-primary font-semibold">✓</div>
+                      )}
                     </div>
                   </div>
-                  {selectedCommands.has(cmd.id!) && (
-                    <div className="text-primary font-semibold">✓</div>
-                  )}
-                </div>
-              </div>
-            ))}
+                ))}
+                {filteredCommands.length === 0 && (
+                  <div className="text-center py-8 text-sm text-muted-foreground">
+                    コマンドがありません
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
 
@@ -152,12 +201,7 @@ export function CommandSelectionDialog({
             キャンセル
           </Button>
           {showSkipButton && onSkip && (
-            <Button variant="secondary" onClick={() => {
-              onSkip();
-              setSelectedCommands(new Set());
-              setSelectedTemplate(null);
-              onOpenChange(false);
-            }}>
+            <Button variant="secondary" onClick={handleSkip}>
               後で
             </Button>
           )}
