@@ -266,23 +266,29 @@ export function FlowEditorSidebar({
       <div className="p-4">
         {!selectedFlowId ? (
           <div className="space-y-3">
-            {flows.map((flow) => (
-              <div
-                key={flow.id}
-                onClick={() => onSelectFlow(flow.id)}
-                className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold">{flow.name}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {flow.items.filter(item => item.type === 'destination').length}地点 ・{" "}
-                      {flow.items.filter(item => item.type === 'commandGroup').length}コマンドグループ
+            {flows.length === 0 ? (
+              <div className="text-center py-8 text-sm text-muted-foreground">
+                フローが登録されていません
+              </div>
+            ) : (
+              flows.map((flow) => (
+                <div
+                  key={flow.id}
+                  onClick={() => onSelectFlow(flow.id)}
+                  className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{flow.name}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {flow.items.filter(item => item.type === 'destination').length}地点 ・{" "}
+                        {flow.items.filter(item => item.type === 'commandGroup').length}コマンドグループ
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         ) : selectedFlow ? (
           <>
