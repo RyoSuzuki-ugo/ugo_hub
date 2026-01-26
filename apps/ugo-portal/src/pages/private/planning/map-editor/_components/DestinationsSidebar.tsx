@@ -140,7 +140,7 @@ export function DestinationsSidebar({
     <div className="flex-1 border-b overflow-y-auto">
       <div className="p-4 border-b bg-muted/30">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">目的地</h3>
+          <h3 className="font-semibold">地点（目的地）</h3>
           <Button variant="outline" size="sm" onClick={onAddDestination}>
             + 追加
           </Button>
@@ -149,7 +149,7 @@ export function DestinationsSidebar({
       <div className="p-4">
         {destinations.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
-            目的地が登録されていません
+            地点（目的地）が登録されていません
           </div>
         ) : (
           <DndContext

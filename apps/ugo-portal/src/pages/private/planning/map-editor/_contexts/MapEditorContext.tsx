@@ -31,7 +31,7 @@ interface MapEditorContextType {
   robotPosition: RobotPosition | null;
   setRobotPosition: (position: RobotPosition | null) => void;
 
-  // 目的地
+  // 地点（目的地）
   destinations: Destination[];
   setDestinations: (destinations: Destination[]) => void;
   selectedDestinationId: string | null;
@@ -88,7 +88,7 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
     r: Math.PI / 4,
   });
 
-  // 目的地
+  // 地点（目的地）
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null);
 

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@repo/shared-ui/components/button";
-import { ArrowLeft, MoreVertical } from "lucide-react";
+import { ArrowLeft, MoreVertical, Minimize2, Maximize2, Plus, Edit } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
   DialogFooter,
 } from "@repo/shared-ui/components/dialog";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import {
   FloorMapPlane,
   RobotMarker,
@@ -41,7 +41,6 @@ function MapEditorContent() {
   const [commandSelectionDialogOpen, setCommandSelectionDialogOpen] = useState(false);
   const [pendingDestination, setPendingDestination] = useState<Destination | null>(null);
   const [isAddingToExistingDest, setIsAddingToExistingDest] = useState(false);
-  const [isFlowEditorMode, setIsFlowEditorMode] = useState(false);
   const [destinationNameDialogOpen, setDestinationNameDialogOpen] = useState(false);
   const [pendingDestinationName, setPendingDestinationName] = useState("");
   const [pendingDestinationData, setPendingDestinationData] = useState<{
@@ -50,6 +49,14 @@ function MapEditorContent() {
     r: number;
   } | null>(null);
   const [newMapDialogOpen, setNewMapDialogOpen] = useState(false);
+  const [sidebarPosition, setSidebarPosition] = useState({ x: window.innerWidth - 420, y: 80 });
+  const [isDraggingSidebar, setIsDraggingSidebar] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
+  const [flowSidebarPosition, setFlowSidebarPosition] = useState({ x: 20, y: 80 });
+  const [isDraggingFlowSidebar, setIsDraggingFlowSidebar] = useState(false);
+  const [flowDragOffset, setFlowDragOffset] = useState({ x: 0, y: 0 });
+  const [isFlowSidebarMinimized, setIsFlowSidebarMinimized] = useState(false);
   const {
     mapImageUrl,
     showRobot,
@@ -69,7 +76,7 @@ function MapEditorContent() {
     setMapPointCommands,
   } = useMapEditor();
 
-  // 選択された目的地に紐づくコマンドを取得
+  // 選択された地点（目的地）に紐づくコマンドを取得
   const selectedDestCommands = useMemo(() => {
     if (!selectedDestForCommand) return [];
 
@@ -87,12 +94,12 @@ function MapEditorContent() {
     });
   }, [selectedDestForCommand, mapPointCommands]);
 
-  // 選択された目的地の座標を取得
+  // 選択された地点（目的地）の座標を取得
   const selectedDestination = destinations.find(
     (d) => d.id === selectedDestinationId
   );
 
-  // 目的地を追加
+  // 地点（目的地）を追加
   const handleAddDestination = () => {
     const baseX = 10;
     const baseY = 10;
@@ -102,7 +109,7 @@ function MapEditorContent() {
     const rotations = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
     const rotation = rotations[destinations.length % 4];
 
-    // まず目的地の位置データを保存
+    // まず地点（目的地）の位置データを保存
     setPendingDestinationData({
       x: baseX + offset,
       y: baseY + offset,
@@ -110,14 +117,14 @@ function MapEditorContent() {
     });
 
     // デフォルトの名前を設定
-    const defaultName = `目的地 ${String.fromCharCode(65 + destinations.length)}`;
+    const defaultName = `地点（目的地） ${String.fromCharCode(65 + destinations.length)}`;
     setPendingDestinationName(defaultName);
 
     // 名前入力ダイアログを開く
     setDestinationNameDialogOpen(true);
   };
 
-  // 目的地の名前が確定したらコマンド選択ダイアログを開く
+  // 地点（目的地）の名前が確定したらコマンド選択ダイアログを開く
   const handleDestinationNameConfirm = (name: string) => {
     if (!pendingDestinationData) return;
 
@@ -139,7 +146,7 @@ function MapEditorContent() {
   // コマンド選択完了時
   const handleCommandSelect = (commands: CommandDef[]) => {
     if (isAddingToExistingDest && selectedDestForCommand) {
-      // 既存の目的地にコマンドを追加
+      // 既存の地点（目的地）にコマンドを追加
       const currentCommands = mapPointCommands.filter(
         mpc => mpc.mapPointId === selectedDestForCommand.id
       );
@@ -155,7 +162,7 @@ function MapEditorContent() {
       setMapPointCommands([...mapPointCommands, ...newMapPointCommands]);
       setIsAddingToExistingDest(false);
     } else if (pendingDestination) {
-      // 新しい目的地を追加
+      // 新しい地点（目的地）を追加
       setDestinations([...destinations, pendingDestination]);
       setSelectedDestinationId(pendingDestination.id);
 
@@ -172,14 +179,14 @@ function MapEditorContent() {
     }
   };
 
-  // 既存の目的地にコマンドを追加
+  // 既存の地点（目的地）にコマンドを追加
   const handleAddCommandToExistingDest = () => {
     setIsAddingToExistingDest(true);
     setCommandDialogOpen(false);
     setCommandSelectionDialogOpen(true);
   };
 
-  // コマンド選択をスキップ（目的地のみ追加）
+  // コマンド選択をスキップ（地点（目的地）のみ追加）
   const handleSkipCommandSelection = () => {
     if (pendingDestination) {
       setDestinations([...destinations, pendingDestination]);
@@ -188,45 +195,89 @@ function MapEditorContent() {
     }
   };
 
+  // サイドバーのドラッグ処理
+  const handleSidebarMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('.sidebar-drag-handle')) {
+      setIsDraggingSidebar(true);
+      setDragOffset({
+        x: e.clientX - sidebarPosition.x,
+        y: e.clientY - sidebarPosition.y,
+      });
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDraggingSidebar) {
+      setSidebarPosition({
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDraggingSidebar(false);
+  };
+
+  // ドラッグイベントリスナーの設定
+  useEffect(() => {
+    if (isDraggingSidebar) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDraggingSidebar, dragOffset]);
+
+  // フローサイドバーのドラッグ処理
+  const handleFlowSidebarMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('.flow-sidebar-drag-handle')) {
+      setIsDraggingFlowSidebar(true);
+      setFlowDragOffset({
+        x: e.clientX - flowSidebarPosition.x,
+        y: e.clientY - flowSidebarPosition.y,
+      });
+    }
+  };
+
+  const handleFlowMouseMove = (e: MouseEvent) => {
+    if (isDraggingFlowSidebar) {
+      setFlowSidebarPosition({
+        x: e.clientX - flowDragOffset.x,
+        y: e.clientY - flowDragOffset.y,
+      });
+    }
+  };
+
+  const handleFlowMouseUp = () => {
+    setIsDraggingFlowSidebar(false);
+  };
+
+  // フローサイドバーのドラッグイベントリスナーの設定
+  useEffect(() => {
+    if (isDraggingFlowSidebar) {
+      window.addEventListener('mousemove', handleFlowMouseMove);
+      window.addEventListener('mouseup', handleFlowMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleFlowMouseMove);
+        window.removeEventListener('mouseup', handleFlowMouseUp);
+      };
+    }
+  }, [isDraggingFlowSidebar, flowDragOffset]);
+
   return (
     <div className="w-full h-screen flex flex-col">
       <div className="flex items-center justify-between p-4 border-b">
         <div>
           <h1 className="text-3xl font-bold">
-            {isFlowEditorMode ? "フローエディタ" : "マップエディタ"}
+            {loading ? "読み込み中..." : floor ? floor.name : ""}
           </h1>
-          <p className="text-muted-foreground">
-            {loading ? "読み込み中..." : floor ? `${floor.name} - ${isFlowEditorMode ? "フローの確認と編集を行います" : "フロアマップの作成と編集を行います"}` : isFlowEditorMode ? "フローの確認と編集を行います" : "フロアマップの作成と編集を行います"}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setNewMapDialogOpen(true)}
-          >
-            新規作成
-          </Button>
-          <Button
-            variant={isFlowEditorMode ? "default" : "outline"}
-            onClick={() => setIsFlowEditorMode(!isFlowEditorMode)}
-          >
-            {isFlowEditorMode ? "マップエディタに戻る" : "フローエディタを開く"}
-          </Button>
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* フローエディタモード時は左サイドバー */}
-        {isFlowEditorMode && (
-          <div className="w-[600px] border-r flex flex-col">
-            <FlowEditorSidebar
-              destinations={destinations}
-              mapPointCommands={mapPointCommands}
-              onReorderDestinations={setDestinations}
-            />
-          </div>
-        )}
-
+      <div className="flex flex-1 overflow-hidden relative">
         {/* メインキャンバス - 3D地図 */}
         <div className="flex-1">
           <Canvas
@@ -245,7 +296,7 @@ function MapEditorContent() {
                 <RobotMarker position={robotPosition} mapRealSize={mapRealSize} />
               )}
 
-              {/* 目的地マーカー */}
+              {/* 地点（目的地）マーカー */}
               {destinations.map((dest) => (
                 <DestinationMarker
                   key={dest.id}
@@ -270,23 +321,198 @@ function MapEditorContent() {
           </Canvas>
         </div>
 
-        {/* マップエディタモード時は右サイドバー */}
-        {!isFlowEditorMode && (
-          <div className="w-[600px] border-l flex flex-col">
-            <DestinationsSidebar
-              destinations={destinations}
-              selectedDestinationId={selectedDestinationId}
-              onDestinationSelect={setSelectedDestinationId}
-              onAddDestination={handleAddDestination}
-              onCommandSettings={(dest) => {
-                setSelectedDestForCommand(dest);
-                setCommandDialogOpen(true);
-              }}
-              onReorder={setDestinations}
-            />
-            <RoutesSidebar />
+        {/* フローティングサイドバー - 地点・経路 */}
+        <div
+          className="absolute bg-white border rounded-lg shadow-lg flex flex-col"
+          style={{
+            left: `${sidebarPosition.x}px`,
+            top: `${sidebarPosition.y}px`,
+            width: isSidebarMinimized ? 'auto' : '400px',
+            maxHeight: isSidebarMinimized ? 'auto' : 'calc(100vh - 160px)',
+            cursor: isDraggingSidebar ? 'grabbing' : 'default',
+          }}
+          onMouseDown={handleSidebarMouseDown}
+        >
+          {/* ドラッグハンドル */}
+          <div className="sidebar-drag-handle px-4 py-2 border-b bg-muted/30 cursor-grab active:cursor-grabbing flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-muted-foreground"
+              >
+                <circle cx="9" cy="12" r="1" />
+                <circle cx="9" cy="5" r="1" />
+                <circle cx="9" cy="19" r="1" />
+                <circle cx="15" cy="12" r="1" />
+                <circle cx="15" cy="5" r="1" />
+                <circle cx="15" cy="19" r="1" />
+              </svg>
+              <span className="text-sm font-semibold text-muted-foreground">
+                {isSidebarMinimized ? "地点・経路" : "マップ情報"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              {!isSidebarMinimized && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setNewMapDialogOpen(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: マップ編集処理
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsSidebarMinimized(!isSidebarMinimized);
+                }}
+              >
+                {isSidebarMinimized ? (
+                  <Maximize2 className="h-4 w-4" />
+                ) : (
+                  <Minimize2 className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
-        )}
+          {!isSidebarMinimized && (
+            <>
+              <DestinationsSidebar
+                destinations={destinations}
+                selectedDestinationId={selectedDestinationId}
+                onDestinationSelect={setSelectedDestinationId}
+                onAddDestination={handleAddDestination}
+                onCommandSettings={(dest) => {
+                  setSelectedDestForCommand(dest);
+                  setCommandDialogOpen(true);
+                }}
+                onReorder={setDestinations}
+              />
+              <RoutesSidebar />
+            </>
+          )}
+        </div>
+
+        {/* フローティングサイドバー - フロー */}
+        <div
+          className="absolute bg-white border rounded-lg shadow-lg flex flex-col"
+          style={{
+            left: `${flowSidebarPosition.x}px`,
+            top: `${flowSidebarPosition.y}px`,
+            width: isFlowSidebarMinimized ? 'auto' : '500px',
+            maxHeight: isFlowSidebarMinimized ? 'auto' : 'calc(100vh - 160px)',
+            cursor: isDraggingFlowSidebar ? 'grabbing' : 'default',
+          }}
+          onMouseDown={handleFlowSidebarMouseDown}
+        >
+          {/* ドラッグハンドル */}
+          <div className="flow-sidebar-drag-handle px-4 py-2 border-b bg-muted/30 cursor-grab active:cursor-grabbing flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-muted-foreground"
+              >
+                <circle cx="9" cy="12" r="1" />
+                <circle cx="9" cy="5" r="1" />
+                <circle cx="9" cy="19" r="1" />
+                <circle cx="15" cy="12" r="1" />
+                <circle cx="15" cy="5" r="1" />
+                <circle cx="15" cy="19" r="1" />
+              </svg>
+              <span className="text-sm font-semibold text-muted-foreground">
+                {isFlowSidebarMinimized ? "フロー" : "フロー情報"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              {!isFlowSidebarMinimized && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: フロー新規作成処理
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: フロー編集処理
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsFlowSidebarMinimized(!isFlowSidebarMinimized);
+                }}
+              >
+                {isFlowSidebarMinimized ? (
+                  <Maximize2 className="h-4 w-4" />
+                ) : (
+                  <Minimize2 className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          {!isFlowSidebarMinimized && (
+            <div className="overflow-y-auto">
+              <FlowEditorSidebar
+                destinations={destinations}
+                mapPointCommands={mapPointCommands}
+                onReorderDestinations={setDestinations}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* コマンド設定ダイアログ */}
@@ -326,7 +552,7 @@ function MapEditorContent() {
         </DialogContent>
       </Dialog>
 
-      {/* 目的地名入力ダイアログ */}
+      {/* 地点（目的地）名入力ダイアログ */}
       <DestinationNameDialog
         open={destinationNameDialogOpen}
         onOpenChange={setDestinationNameDialogOpen}
@@ -334,7 +560,7 @@ function MapEditorContent() {
         defaultName={pendingDestinationName}
       />
 
-      {/* コマンド選択ダイアログ（目的地追加時） */}
+      {/* コマンド選択ダイアログ（地点（目的地）追加時） */}
       <CommandSelectionDialog
         open={commandSelectionDialogOpen}
         onOpenChange={setCommandSelectionDialogOpen}

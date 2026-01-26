@@ -43,11 +43,11 @@ export function DestinationNameDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>目的地の名前を入力</DialogTitle>
+          <DialogTitle>地点（目的地）の名前を入力</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="destination-name">目的地名</Label>
+            <Label htmlFor="destination-name">地点（目的地）名</Label>
             <Input
               id="destination-name"
               value={name}

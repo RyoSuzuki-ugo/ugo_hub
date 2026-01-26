@@ -131,7 +131,7 @@ export function FlowEditorSidebar({
     })
   );
 
-  // 各目的地に紐づくコマンドを整理
+  // 各地点（目的地）に紐づくコマンドを整理
   const destinationCommands = useMemo(() => {
     return destinations.map((dest) => {
       const commands = mapPointCommands
@@ -172,7 +172,7 @@ export function FlowEditorSidebar({
       <div className="p-4">
         {destinationCommands.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
-            目的地が登録されていません
+            地点（目的地）が登録されていません
           </div>
         ) : (
           <DndContext
