@@ -169,12 +169,6 @@ export function FlowEditorSidebar({
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="p-4 border-b bg-muted/30">
-        <h3 className="font-semibold">フローエディタ</h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          目的地ごとのコマンドフローを確認できます
-        </p>
-      </div>
       <div className="p-4">
         {destinationCommands.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">

@@ -206,6 +206,17 @@ function MapEditorContent() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
+        {/* フローエディタモード時は左サイドバー */}
+        {isFlowEditorMode && (
+          <div className="w-[600px] border-r flex flex-col">
+            <FlowEditorSidebar
+              destinations={destinations}
+              mapPointCommands={mapPointCommands}
+              onReorderDestinations={setDestinations}
+            />
+          </div>
+        )}
+
         {/* メインキャンバス - 3D地図 */}
         <div className="flex-1">
           <Canvas
@@ -249,31 +260,23 @@ function MapEditorContent() {
           </Canvas>
         </div>
 
-        {/* 右サイドバー */}
-        <div className="w-[600px] border-l flex flex-col">
-          {isFlowEditorMode ? (
-            <FlowEditorSidebar
+        {/* マップエディタモード時は右サイドバー */}
+        {!isFlowEditorMode && (
+          <div className="w-[600px] border-l flex flex-col">
+            <DestinationsSidebar
               destinations={destinations}
-              mapPointCommands={mapPointCommands}
-              onReorderDestinations={setDestinations}
+              selectedDestinationId={selectedDestinationId}
+              onDestinationSelect={setSelectedDestinationId}
+              onAddDestination={handleAddDestination}
+              onCommandSettings={(dest) => {
+                setSelectedDestForCommand(dest);
+                setCommandDialogOpen(true);
+              }}
+              onReorder={setDestinations}
             />
-          ) : (
-            <>
-              <DestinationsSidebar
-                destinations={destinations}
-                selectedDestinationId={selectedDestinationId}
-                onDestinationSelect={setSelectedDestinationId}
-                onAddDestination={handleAddDestination}
-                onCommandSettings={(dest) => {
-                  setSelectedDestForCommand(dest);
-                  setCommandDialogOpen(true);
-                }}
-                onReorder={setDestinations}
-              />
-              <RoutesSidebar />
-            </>
-          )}
-        </div>
+            <RoutesSidebar />
+          </div>
+        )}
       </div>
 
       {/* コマンド設定ダイアログ */}
