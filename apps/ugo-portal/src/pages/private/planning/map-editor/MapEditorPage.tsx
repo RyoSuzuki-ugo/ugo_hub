@@ -258,6 +258,44 @@ function MapEditorContent() {
     setConvertDestDialogOpen(true);
   };
 
+  // フローのテスト実行
+  const handleTestExecuteFlow = (flowId: string) => {
+    const flow = flows.find(f => f.id === flowId);
+    if (!flow) return;
+
+    console.log('=== フローテスト実行 ===');
+    console.log('フロー名:', flow.name);
+    console.log('アイテム数:', flow.items.length);
+
+    flow.items.forEach((item, index) => {
+      if (item.type === 'destination') {
+        const dest = item.destination;
+        const commands = mapPointCommands
+          .filter(mpc => mpc.mapPointId === dest.id)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        console.log(`\n${index + 1}. 地点: ${dest.name}`);
+        console.log(`   座標: (${dest.x}, ${dest.y}), 回転: ${dest.r}`);
+        console.log(`   コマンド数: ${commands.length}`);
+        commands.forEach((cmd, cmdIndex) => {
+          const cmdDef = mockCommandDefs.find(c => c.id === cmd.commandDefId);
+          console.log(`   ${cmdIndex + 1}. ${cmdDef?.name || '不明なコマンド'}`);
+        });
+      } else {
+        const group = item.commandGroup;
+        console.log(`\n${index + 1}. コマンドグループ: ${group.name}`);
+        console.log(`   コマンド数: ${group.commands.length}`);
+        group.commands.forEach((cmdId, cmdIndex) => {
+          const cmdDef = mockCommandDefs.find(c => c.id === cmdId);
+          console.log(`   ${cmdIndex + 1}. ${cmdDef?.name || '不明なコマンド'}`);
+        });
+      }
+    });
+
+    console.log('\n=== テスト実行完了 ===\n');
+    alert(`フロー「${flow.name}」のテスト実行を開始しました。\n詳細はコンソールを確認してください。`);
+  };
+
   // コマンドグループの地点登録を確定
   const handleConfirmConvertToDestination = (name: string, x: number, y: number, r: number) => {
     if (!convertCommandGroupId || !selectedFlowId) return;
@@ -734,6 +772,7 @@ function MapEditorContent() {
                 onSelectFlow={setSelectedFlowId}
                 onAddCommandGroup={handleAddCommandGroup}
                 onConvertToDestination={handleConvertToDestination}
+                onTestExecuteFlow={handleTestExecuteFlow}
               />
             </div>
           )}

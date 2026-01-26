@@ -5,7 +5,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/shared-ui/components/accordion";
-import { GripVertical, Package, MapPin } from "lucide-react";
+import { GripVertical, Package, MapPin, MoreVertical, Play } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/shared-ui/components/dropdown-menu";
+import { Button } from "@repo/shared-ui/components/button";
 import type { Flow, FlowItem } from "../_contexts/MapEditorContext";
 import type { MockMapPointCommandDto } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../../data/mockCommandDefs";
@@ -26,6 +33,7 @@ interface FlowEditorSidebarProps {
   onSelectFlow: (flowId: string | null) => void;
   onAddCommandGroup: () => void;
   onConvertToDestination: (commandGroupId: string) => void;
+  onTestExecuteFlow: (flowId: string) => void;
 }
 
 interface SortableFlowItemProps {
@@ -232,6 +240,7 @@ export function FlowEditorSidebar({
   onSelectFlow,
   onAddCommandGroup,
   onConvertToDestination,
+  onTestExecuteFlow,
 }: FlowEditorSidebarProps) {
   const selectedFlow = flows.find((f) => f.id === selectedFlowId);
 
@@ -278,10 +287,30 @@ export function FlowEditorSidebar({
         ) : selectedFlow ? (
           <>
             <div className="mb-4 pb-3 border-b">
-              <h3 className="font-semibold">{selectedFlow.name}</h3>
-              <p className="text-xs text-muted-foreground mt-1">
-                {destinationCount}地点 ・ {commandGroupCount}コマンドグループ
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">{selectedFlow.name}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {destinationCount}地点 ・ {commandGroupCount}コマンドグループ
+                  </p>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => onTestExecuteFlow(selectedFlow.id)}
+                      className="cursor-pointer"
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      テスト実行
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
             {selectedFlow.items.length === 0 ? (
