@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@repo/shared-ui/components/button";
-import { ArrowLeft, MoreVertical, Minimize2, Maximize2, Plus, Edit, GripVertical } from "lucide-react";
+import { ArrowLeft, MoreVertical, Minimize2, Maximize2, Plus, Edit, GripVertical, Link } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -613,6 +613,15 @@ function MapEditorContent() {
                 マップ作成を完了
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={() => {
+                // TODO: ユーザマップに地点情報を紐付ける処理
+              }}
+            >
+              <Link className="h-4 w-4 mr-2" />
+              地点情報を紐付ける
+            </Button>
             <Button
               variant="outline"
               onClick={handleInjectMockData}
