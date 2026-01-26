@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/compon
 import { ArrowLeft } from "lucide-react";
 import { BuildingFloorTab } from "./_components/building-floor-tab.component";
 import { BuildingFloorProvider } from "./_contexts/BuildingFloorContext";
+import { FlowTab } from "./_components/FlowTab";
 
 export function PlanningPage() {
   const navigate = useNavigate();
@@ -32,9 +33,7 @@ export function PlanningPage() {
           </TabsList>
 
           <TabsContent value="flow">
-            <div className="text-center py-20 text-gray-500">
-              業務（Flow）のコンテンツ
-            </div>
+            <FlowTab />
           </TabsContent>
 
           <TabsContent value="robot">
