@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@repo/shared-ui/components/button";
-import { ArrowLeft, MoreVertical, Minimize2, Maximize2, Plus, Edit } from "lucide-react";
+import { ArrowLeft, MoreVertical, Minimize2, Maximize2, Plus, Edit, GripVertical } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +34,7 @@ import { DestinationNameDialog } from "./_components/DestinationNameDialog";
 import { FlowNameDialog } from "./_components/FlowNameDialog";
 import { CommandGroupDialog } from "./_components/CommandGroupDialog";
 import { DestinationWithPositionDialog } from "./_components/DestinationWithPositionDialog";
+import { RobotControlCard } from "../../../../features/robot-control-card";
 import type { CommandDef } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../data/mockCommandDefs";
 import { mockDestinations, mockFlows, mockMapPointCommandsData } from "../../../../data/mockMapData";
@@ -68,6 +69,11 @@ function MapEditorContent() {
   const [commandGroupDialogOpen, setCommandGroupDialogOpen] = useState(false);
   const [convertCommandGroupId, setConvertCommandGroupId] = useState<string | null>(null);
   const [convertDestDialogOpen, setConvertDestDialogOpen] = useState(false);
+  const [showRobotControl, setShowRobotControl] = useState(false);
+  const [robotControlPosition, setRobotControlPosition] = useState({ x: window.innerWidth / 2 - 250, y: 80 });
+  const [isDraggingRobotControl, setIsDraggingRobotControl] = useState(false);
+  const [robotControlDragOffset, setRobotControlDragOffset] = useState({ x: 0, y: 0 });
+  const [isRobotControlMinimized, setIsRobotControlMinimized] = useState(false);
   const {
     mapImageUrl,
     showRobot,
@@ -516,6 +522,72 @@ function MapEditorContent() {
     }
   }, [isDraggingFlowSidebar, flowDragOffset]);
 
+  // ロボットコントロールのドラッグ処理
+  const handleRobotControlMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('.robot-control-drag-handle')) {
+      setIsDraggingRobotControl(true);
+      setRobotControlDragOffset({
+        x: e.clientX - robotControlPosition.x,
+        y: e.clientY - robotControlPosition.y,
+      });
+    }
+  };
+
+  const handleRobotControlMouseMove = (e: MouseEvent) => {
+    if (isDraggingRobotControl) {
+      setRobotControlPosition({
+        x: e.clientX - robotControlDragOffset.x,
+        y: e.clientY - robotControlDragOffset.y,
+      });
+    }
+  };
+
+  const handleRobotControlMouseUp = () => {
+    setIsDraggingRobotControl(false);
+  };
+
+  useEffect(() => {
+    if (isDraggingRobotControl) {
+      window.addEventListener('mousemove', handleRobotControlMouseMove);
+      window.addEventListener('mouseup', handleRobotControlMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleRobotControlMouseMove);
+        window.removeEventListener('mouseup', handleRobotControlMouseUp);
+      };
+    }
+  }, [isDraggingRobotControl, robotControlDragOffset]);
+
+  // ロボット操作ハンドラー
+  const handleRobotMoveForward = () => {
+    console.log("ロボット: 前進");
+    // TODO: ロボット制御APIを呼び出す
+  };
+
+  const handleRobotMoveBackward = () => {
+    console.log("ロボット: 後退");
+    // TODO: ロボット制御APIを呼び出す
+  };
+
+  const handleRobotMoveLeft = () => {
+    console.log("ロボット: 左移動");
+    // TODO: ロボット制御APIを呼び出す
+  };
+
+  const handleRobotMoveRight = () => {
+    console.log("ロボット: 右移動");
+    // TODO: ロボット制御APIを呼び出す
+  };
+
+  const handleRobotRotateLeft = () => {
+    console.log("ロボット: 左回転");
+    // TODO: ロボット制御APIを呼び出す
+  };
+
+  const handleRobotRotateRight = () => {
+    console.log("ロボット: 右回転");
+    // TODO: ロボット制御APIを呼び出す
+  };
+
   return (
     <DndContext
       sensors={sensors}
@@ -529,12 +601,25 @@ function MapEditorContent() {
               {loading ? "読み込み中..." : floor ? floor.name : ""}
             </h1>
           </div>
-          <Button
-            variant="outline"
-            onClick={handleInjectMockData}
-          >
-            モックデータ注入
-          </Button>
+          <div className="flex items-center gap-2">
+            {showRobotControl && (
+              <Button
+                variant="default"
+                onClick={() => {
+                  setShowRobotControl(false);
+                  alert("マップ作成が完了しました");
+                }}
+              >
+                マップ作成を完了
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              onClick={handleInjectMockData}
+            >
+              モックデータ注入
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-1 overflow-hidden relative">
@@ -777,6 +862,62 @@ function MapEditorContent() {
             </div>
           )}
         </div>
+
+        {/* フローティングロボットコントロール */}
+        {showRobotControl && (
+          <div
+            className="absolute bg-white border rounded-lg shadow-lg flex flex-col"
+            style={{
+              left: `${robotControlPosition.x}px`,
+              top: `${robotControlPosition.y}px`,
+              width: isRobotControlMinimized ? 'auto' : '500px',
+              maxHeight: isRobotControlMinimized ? 'auto' : 'calc(100vh - 160px)',
+              cursor: isDraggingRobotControl ? 'grabbing' : 'default',
+            }}
+            onMouseDown={handleRobotControlMouseDown}
+          >
+            {/* ドラッグハンドル */}
+            <div className="robot-control-drag-handle px-4 py-2 border-b bg-muted/30 cursor-grab active:cursor-grabbing flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <GripVertical className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-semibold text-muted-foreground">
+                  {isRobotControlMinimized ? "ロボット操作" : "ロボット操作"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsRobotControlMinimized(!isRobotControlMinimized);
+                  }}
+                >
+                  {isRobotControlMinimized ? (
+                    <Maximize2 className="h-4 w-4" />
+                  ) : (
+                    <Minimize2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+            {!isRobotControlMinimized && (
+              <div className="p-4">
+                <RobotControlCard
+                  serialNo="UM01AA-A294X0006"
+                  name="マップ作成用ロボット"
+                  onMoveForward={handleRobotMoveForward}
+                  onMoveBackward={handleRobotMoveBackward}
+                  onMoveLeft={handleRobotMoveLeft}
+                  onMoveRight={handleRobotMoveRight}
+                  onRotateLeft={handleRobotRotateLeft}
+                  onRotateRight={handleRobotRotateRight}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* コマンド設定ダイアログ */}
@@ -902,7 +1043,9 @@ function MapEditorContent() {
                 className="h-auto py-4 flex flex-col items-center gap-2"
                 onClick={() => {
                   setNewMapDialogOpen(false);
-                  // TODO: マップ作成処理
+                  setShowRobotControl(true);
+                  setIsSidebarMinimized(true);
+                  setIsFlowSidebarMinimized(true);
                 }}
               >
                 <svg
