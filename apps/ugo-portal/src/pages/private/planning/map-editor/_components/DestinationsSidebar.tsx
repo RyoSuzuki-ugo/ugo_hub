@@ -8,18 +8,7 @@ import {
 import { MoreVertical, GripVertical } from "lucide-react";
 import type { Destination } from "../_contexts/MapEditorContext";
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -54,7 +43,13 @@ function SortableDestination({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: dest.id });
+  } = useSortable({
+    id: dest.id,
+    data: {
+      type: 'destination',
+      destination: dest,
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -118,24 +113,6 @@ export function DestinationsSidebar({
   onCommandSettings,
   onReorder,
 }: DestinationsSidebarProps) {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = destinations.findIndex((dest) => dest.id === active.id);
-      const newIndex = destinations.findIndex((dest) => dest.id === over.id);
-      const newDestinations = arrayMove(destinations, oldIndex, newIndex);
-      onReorder(newDestinations);
-    }
-  };
-
   return (
     <div className="flex-1 border-b overflow-y-auto">
       <div className="p-4 border-b bg-muted/30">
@@ -152,28 +129,22 @@ export function DestinationsSidebar({
             地点（目的地）が登録されていません
           </div>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
+          <SortableContext
+            items={destinations.map((d) => d.id)}
+            strategy={verticalListSortingStrategy}
           >
-            <SortableContext
-              items={destinations.map((d) => d.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-2">
-                {destinations.map((dest) => (
-                  <SortableDestination
-                    key={dest.id}
-                    dest={dest}
-                    isSelected={selectedDestinationId === dest.id}
-                    onSelect={() => onDestinationSelect(dest.id)}
-                    onCommandSettings={() => onCommandSettings(dest)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+            <div className="space-y-2">
+              {destinations.map((dest) => (
+                <SortableDestination
+                  key={dest.id}
+                  dest={dest}
+                  isSelected={selectedDestinationId === dest.id}
+                  onSelect={() => onDestinationSelect(dest.id)}
+                  onCommandSettings={() => onCommandSettings(dest)}
+                />
+              ))}
+            </div>
+          </SortableContext>
         )}
       </div>
     </div>

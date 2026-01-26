@@ -16,6 +16,7 @@ import {
 } from "@repo/shared-ui/components/dialog";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useState, useEffect } from "react";
+import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import {
   FloorMapPlane,
   RobotMarker,
@@ -24,12 +25,13 @@ import {
   MapCamera,
   MapLighting,
 } from "@repo/feature";
-import { MapEditorProvider, useMapEditor, type Destination } from "./_contexts/MapEditorContext";
+import { MapEditorProvider, useMapEditor, type Destination, type Flow } from "./_contexts/MapEditorContext";
 import { CommandSelectionDialog } from "../../../../features/command-selection-dialog";
 import { DestinationsSidebar } from "./_components/DestinationsSidebar";
 import { RoutesSidebar } from "./_components/RoutesSidebar";
 import { FlowEditorSidebar } from "./_components/FlowEditorSidebar";
 import { DestinationNameDialog } from "./_components/DestinationNameDialog";
+import { FlowNameDialog } from "./_components/FlowNameDialog";
 import type { CommandDef } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../data/mockCommandDefs";
 import { useMemo } from "react";
@@ -57,6 +59,8 @@ function MapEditorContent() {
   const [isDraggingFlowSidebar, setIsDraggingFlowSidebar] = useState(false);
   const [flowDragOffset, setFlowDragOffset] = useState({ x: 0, y: 0 });
   const [isFlowSidebarMinimized, setIsFlowSidebarMinimized] = useState(false);
+  const [flowNameDialogOpen, setFlowNameDialogOpen] = useState(false);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const {
     mapImageUrl,
     showRobot,
@@ -74,6 +78,10 @@ function MapEditorContent() {
     setSelectedDestinationId,
     mapPointCommands,
     setMapPointCommands,
+    flows,
+    setFlows,
+    selectedFlowId,
+    setSelectedFlowId,
   } = useMapEditor();
 
   // 選択された地点（目的地）に紐づくコマンドを取得
@@ -195,6 +203,103 @@ function MapEditorContent() {
     }
   };
 
+  // フロー作成
+  const handleCreateFlow = (name: string) => {
+    const newFlow: Flow = {
+      id: `flow-${flows.length + 1}`,
+      name,
+      destinations: [],
+    };
+    setFlows([...flows, newFlow]);
+    setSelectedFlowId(newFlow.id);
+  };
+
+  // ドラッグ&ドロップのセンサー設定
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  // ドラッグ開始
+  const handleDragStart = (event: any) => {
+    setActiveDragId(event.active.id);
+  };
+
+  // ドラッグ終了 - 地点をフローに追加 or マップ情報内での並び替え or フロー内での並び替え
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveDragId(null);
+
+    if (!over) return;
+
+    const draggedData = active.data.current;
+
+    // フローのドロップゾーンにドロップされた場合
+    if (over.id.toString().startsWith('flow-')) {
+      const flowId = over.id.toString().replace('flow-', '');
+
+      if (draggedData?.type === 'destination') {
+        const destination = draggedData.destination as Destination;
+        const targetFlow = flows.find(f => f.id === flowId);
+
+        if (targetFlow) {
+          // 既に追加されていないかチェック
+          const alreadyExists = targetFlow.destinations.some(d => d.id === destination.id);
+
+          if (!alreadyExists) {
+            setFlows(flows.map(flow =>
+              flow.id === flowId
+                ? { ...flow, destinations: [...flow.destinations, destination] }
+                : flow
+            ));
+          }
+        }
+      }
+    }
+    // フロー内での地点の並び替え
+    else if (selectedFlowId && active.id !== over.id) {
+      const selectedFlow = flows.find(f => f.id === selectedFlowId);
+
+      if (selectedFlow) {
+        const oldIndex = selectedFlow.destinations.findIndex((dest) => dest.id === active.id);
+        const newIndex = selectedFlow.destinations.findIndex((dest) => dest.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newDestinations = [...selectedFlow.destinations];
+          const [movedItem] = newDestinations.splice(oldIndex, 1);
+          newDestinations.splice(newIndex, 0, movedItem);
+
+          setFlows(flows.map(flow =>
+            flow.id === selectedFlowId
+              ? { ...flow, destinations: newDestinations }
+              : flow
+          ));
+          return;
+        }
+      }
+    }
+
+    // マップ情報内での並び替え
+    if (active.id !== over.id && draggedData?.type === 'destination') {
+      const oldIndex = destinations.findIndex((dest) => dest.id === active.id);
+      const newIndex = destinations.findIndex((dest) => dest.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newDestinations = [...destinations];
+        const [movedItem] = newDestinations.splice(oldIndex, 1);
+        newDestinations.splice(newIndex, 0, movedItem);
+        setDestinations(newDestinations);
+      }
+    }
+  };
+
+  const activeDragDestination = activeDragId
+    ? destinations.find(d => d.id === activeDragId)
+    : null;
+
   // サイドバーのドラッグ処理
   const handleSidebarMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.sidebar-drag-handle')) {
@@ -268,16 +373,21 @@ function MapEditorContent() {
   }, [isDraggingFlowSidebar, flowDragOffset]);
 
   return (
-    <div className="w-full h-screen flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {loading ? "読み込み中..." : floor ? floor.name : ""}
-          </h1>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="w-full h-screen flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b">
+          <div>
+            <h1 className="text-3xl font-bold">
+              {loading ? "読み込み中..." : floor ? floor.name : ""}
+            </h1>
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-1 overflow-hidden relative">
+        <div className="flex flex-1 overflow-hidden relative">
         {/* メインキャンバス - 3D地図 */}
         <div className="flex-1">
           <Canvas
@@ -468,7 +578,7 @@ function MapEditorContent() {
                     className="h-6 w-6 p-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: フロー新規作成処理
+                      setFlowNameDialogOpen(true);
                     }}
                   >
                     <Plus className="h-4 w-4" />
@@ -506,9 +616,10 @@ function MapEditorContent() {
           {!isFlowSidebarMinimized && (
             <div className="overflow-y-auto">
               <FlowEditorSidebar
-                destinations={destinations}
+                flows={flows}
                 mapPointCommands={mapPointCommands}
-                onReorderDestinations={setDestinations}
+                selectedFlowId={selectedFlowId}
+                onSelectFlow={setSelectedFlowId}
               />
             </div>
           )}
@@ -568,6 +679,13 @@ function MapEditorContent() {
         onSkip={handleSkipCommandSelection}
         destinationName={pendingDestination?.name}
         showSkipButton={!isAddingToExistingDest}
+      />
+
+      {/* フロー名入力ダイアログ */}
+      <FlowNameDialog
+        open={flowNameDialogOpen}
+        onOpenChange={setFlowNameDialogOpen}
+        onConfirm={handleCreateFlow}
       />
 
       {/* 新規マップ作成ダイアログ */}
@@ -649,7 +767,20 @@ function MapEditorContent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+
+      {/* ドラッグオーバーレイ */}
+      <DragOverlay>
+        {activeDragDestination ? (
+          <div className="p-3 border rounded-lg bg-white shadow-lg">
+            <div className="font-medium text-sm">{activeDragDestination.name}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              座標: ({activeDragDestination.x}, {activeDragDestination.y})
+            </div>
+          </div>
+        ) : null}
+      </DragOverlay>
+      </div>
+    </DndContext>
   );
 }
 

@@ -18,6 +18,12 @@ export interface Destination {
   commands?: Command[];
 }
 
+export interface Flow {
+  id: string;
+  name: string;
+  destinations: Destination[];
+}
+
 interface MapEditorContextType {
   // マップ関連
   mapImageUrl: string | null;
@@ -40,6 +46,12 @@ interface MapEditorContextType {
   // マップポイントコマンド
   mapPointCommands: MockMapPointCommandDto[];
   setMapPointCommands: (commands: MockMapPointCommandDto[]) => void;
+
+  // フロー
+  flows: Flow[];
+  setFlows: (flows: Flow[]) => void;
+  selectedFlowId: string | null;
+  setSelectedFlowId: (id: string | null) => void;
 
   // フロア情報
   floor: FloorWithRelations | null;
@@ -94,6 +106,10 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
 
   // マップポイントコマンド
   const [mapPointCommands, setMapPointCommands] = useState<MockMapPointCommandDto[]>([]);
+
+  // フロー
+  const [flows, setFlows] = useState<Flow[]>([]);
+  const [selectedFlowId, setSelectedFlowId] = useState<string | null>(null);
 
   // フロア情報
   const [floor, setFloor] = useState<FloorWithRelations | null>(null);
@@ -172,6 +188,10 @@ export function MapEditorProvider({ children, floorId }: MapEditorProviderProps)
     setSelectedDestinationId,
     mapPointCommands,
     setMapPointCommands,
+    flows,
+    setFlows,
+    selectedFlowId,
+    setSelectedFlowId,
     floor,
     loading,
     selectedBuildingId,

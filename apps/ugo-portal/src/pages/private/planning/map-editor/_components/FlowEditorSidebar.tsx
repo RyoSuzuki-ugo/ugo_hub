@@ -6,31 +6,24 @@ import {
   AccordionTrigger,
 } from "@repo/shared-ui/components/accordion";
 import { GripVertical } from "lucide-react";
-import type { Destination } from "../_contexts/MapEditorContext";
+import type { Destination, Flow } from "../_contexts/MapEditorContext";
 import type { MockMapPointCommandDto } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../../data/mockCommandDefs";
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
+  useDroppable,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 interface FlowEditorSidebarProps {
-  destinations: Destination[];
+  flows: Flow[];
   mapPointCommands: MockMapPointCommandDto[];
-  onReorderDestinations: (newDestinations: Destination[]) => void;
+  selectedFlowId: string | null;
+  onSelectFlow: (flowId: string | null) => void;
 }
 
 interface SortableAccordionItemProps {
@@ -119,21 +112,40 @@ function SortableAccordionItem({ item, index }: SortableAccordionItemProps) {
   );
 }
 
-export function FlowEditorSidebar({
-  destinations,
-  mapPointCommands,
-  onReorderDestinations,
-}: FlowEditorSidebarProps) {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+function FlowDropZone({ flowId }: { flowId: string }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `flow-${flowId}`,
+  });
 
-  // 各地点（目的地）に紐づくコマンドを整理
+  return (
+    <div
+      ref={setNodeRef}
+      className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+        isOver
+          ? "border-primary bg-primary/5"
+          : "border-muted-foreground/30 bg-muted/10"
+      }`}
+    >
+      <p className="text-sm text-muted-foreground">
+        マップ情報から地点をドラッグして追加
+      </p>
+    </div>
+  );
+}
+
+export function FlowEditorSidebar({
+  flows,
+  mapPointCommands,
+  selectedFlowId,
+  onSelectFlow,
+}: FlowEditorSidebarProps) {
+  const selectedFlow = flows.find((f) => f.id === selectedFlowId);
+
+  // 選択されたフローの地点に紐づくコマンドを整理
   const destinationCommands = useMemo(() => {
-    return destinations.map((dest) => {
+    if (!selectedFlow) return [];
+
+    return selectedFlow.destinations.map((dest) => {
       const commands = mapPointCommands
         .filter((mpc) => mpc.mapPointId === dest.id)
         .sort((a, b) => (a.order || 0) - (b.order || 0))
@@ -154,47 +166,68 @@ export function FlowEditorSidebar({
         commands,
       };
     });
-  }, [destinations, mapPointCommands]);
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = destinations.findIndex((dest) => dest.id === active.id);
-      const newIndex = destinations.findIndex((dest) => dest.id === over.id);
-      const newDestinations = arrayMove(destinations, oldIndex, newIndex);
-      onReorderDestinations(newDestinations);
-    }
-  };
+  }, [selectedFlow, mapPointCommands]);
 
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4">
-        {destinationCommands.length === 0 ? (
+        {flows.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
-            地点（目的地）が登録されていません
+            フローが登録されていません
+            <br />
+            「+」ボタンから新規作成してください
+          </div>
+        ) : !selectedFlow ? (
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground mb-3">
+              編集するフローを選択してください
+            </p>
+            {flows.map((flow) => (
+              <div
+                key={flow.id}
+                className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                onClick={() => onSelectFlow(flow.id)}
+              >
+                <div className="font-medium">{flow.name}</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {flow.destinations.length}地点
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={destinations.map((d) => d.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <Accordion type="multiple" className="w-full">
-                {destinationCommands.map((item, index) => (
-                  <SortableAccordionItem
-                    key={item.destination.id}
-                    item={item}
-                    index={index}
-                  />
-                ))}
-              </Accordion>
-            </SortableContext>
-          </DndContext>
+          <>
+            <div className="mb-4 pb-3 border-b">
+              <h3 className="font-semibold">{selectedFlow.name}</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                {selectedFlow.destinations.length}地点
+              </p>
+            </div>
+
+            {selectedFlow.destinations.length === 0 ? (
+              <FlowDropZone flowId={selectedFlow.id} />
+            ) : (
+              <>
+                <SortableContext
+                  items={selectedFlow.destinations.map((d) => d.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <Accordion type="multiple" className="w-full">
+                    {destinationCommands.map((item, index) => (
+                      <SortableAccordionItem
+                        key={item.destination.id}
+                        item={item}
+                        index={index}
+                      />
+                    ))}
+                  </Accordion>
+                </SortableContext>
+                <div className="mt-4">
+                  <FlowDropZone flowId={selectedFlow.id} />
+                </div>
+              </>
+            )}
+          </>
         )}
       </div>
     </div>
