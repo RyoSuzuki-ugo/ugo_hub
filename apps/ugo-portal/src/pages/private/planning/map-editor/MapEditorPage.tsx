@@ -33,6 +33,7 @@ import { FlowEditorSidebar } from "./_components/FlowEditorSidebar";
 import { DestinationNameDialog } from "./_components/DestinationNameDialog";
 import { FlowNameDialog } from "./_components/FlowNameDialog";
 import { CommandGroupDialog } from "./_components/CommandGroupDialog";
+import { DestinationWithPositionDialog } from "./_components/DestinationWithPositionDialog";
 import type { CommandDef } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../data/mockCommandDefs";
 import { mockDestinations, mockFlows, mockMapPointCommandsData } from "../../../../data/mockMapData";
@@ -65,6 +66,8 @@ function MapEditorContent() {
   const [flowNameDialogOpen, setFlowNameDialogOpen] = useState(false);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [commandGroupDialogOpen, setCommandGroupDialogOpen] = useState(false);
+  const [convertCommandGroupId, setConvertCommandGroupId] = useState<string | null>(null);
+  const [convertDestDialogOpen, setConvertDestDialogOpen] = useState(false);
   const {
     mapImageUrl,
     showRobot,
@@ -247,6 +250,66 @@ function MapEditorContent() {
         ? { ...flow, items: [...flow.items, { type: 'commandGroup', commandGroup: newGroup }] }
         : flow
     ));
+  };
+
+  // コマンドグループを地点として登録
+  const handleConvertToDestination = (commandGroupId: string) => {
+    setConvertCommandGroupId(commandGroupId);
+    setConvertDestDialogOpen(true);
+  };
+
+  // コマンドグループの地点登録を確定
+  const handleConfirmConvertToDestination = (name: string, x: number, y: number, r: number) => {
+    if (!convertCommandGroupId || !selectedFlowId) return;
+
+    const selectedFlow = flows.find(f => f.id === selectedFlowId);
+    if (!selectedFlow) return;
+
+    const commandGroupItem = selectedFlow.items.find(
+      item => item.type === 'commandGroup' && item.commandGroup.id === convertCommandGroupId
+    );
+
+    if (!commandGroupItem || commandGroupItem.type !== 'commandGroup') return;
+
+    // 新しい地点を作成
+    const newDestination: Destination = {
+      id: `dest-${Date.now()}`,
+      name,
+      x,
+      y,
+      r,
+      commands: [],
+    };
+
+    // 地点を追加
+    setDestinations([...destinations, newDestination]);
+
+    // コマンドグループのコマンドを地点のコマンドとして登録
+    const commandGroup = commandGroupItem.commandGroup;
+    const newMapPointCommands = commandGroup.commands.map((cmdId, index) => ({
+      id: `mpc-${Date.now()}-${index}`,
+      mapPointId: newDestination.id,
+      commandDefId: cmdId,
+      order: index,
+    }));
+    setMapPointCommands([...mapPointCommands, ...newMapPointCommands]);
+
+    // フローのアイテムをコマンドグループから地点に置き換え
+    setFlows(flows.map(flow =>
+      flow.id === selectedFlowId
+        ? {
+            ...flow,
+            items: flow.items.map(item =>
+              item.type === 'commandGroup' && item.commandGroup.id === convertCommandGroupId
+                ? { type: 'destination', destination: newDestination }
+                : item
+            ),
+          }
+        : flow
+    ));
+
+    setConvertCommandGroupId(null);
+    setConvertDestDialogOpen(false);
   };
 
   // ドラッグ&ドロップのセンサー設定
@@ -670,6 +733,7 @@ function MapEditorContent() {
                 selectedFlowId={selectedFlowId}
                 onSelectFlow={setSelectedFlowId}
                 onAddCommandGroup={handleAddCommandGroup}
+                onConvertToDestination={handleConvertToDestination}
               />
             </div>
           )}
@@ -743,6 +807,14 @@ function MapEditorContent() {
         open={commandGroupDialogOpen}
         onOpenChange={setCommandGroupDialogOpen}
         onConfirm={handleCreateCommandGroup}
+      />
+
+      {/* コマンドグループを地点として登録ダイアログ */}
+      <DestinationWithPositionDialog
+        open={convertDestDialogOpen}
+        onOpenChange={setConvertDestDialogOpen}
+        onConfirm={handleConfirmConvertToDestination}
+        title="コマンドグループを地点として登録"
       />
 
       {/* 新規マップ作成ダイアログ */}

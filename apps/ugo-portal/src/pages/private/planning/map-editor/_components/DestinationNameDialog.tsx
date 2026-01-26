@@ -14,14 +14,18 @@ interface DestinationNameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: (name: string) => void;
-  defaultName: string;
+  defaultName?: string;
+  title?: string;
+  placeholder?: string;
 }
 
 export function DestinationNameDialog({
   open,
   onOpenChange,
   onConfirm,
-  defaultName,
+  defaultName = "",
+  title = "地点（目的地）の名前を入力",
+  placeholder = "例: 充電ステーション",
 }: DestinationNameDialogProps) {
   const [name, setName] = useState(defaultName);
 
@@ -43,7 +47,7 @@ export function DestinationNameDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>地点（目的地）の名前を入力</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
@@ -52,7 +56,7 @@ export function DestinationNameDialog({
               id="destination-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="例: 充電ステーション"
+              placeholder={placeholder}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleConfirm();

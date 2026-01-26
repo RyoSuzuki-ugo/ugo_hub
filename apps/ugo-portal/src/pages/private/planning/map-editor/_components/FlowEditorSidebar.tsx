@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/shared-ui/components/accordion";
-import { GripVertical, Package } from "lucide-react";
+import { GripVertical, Package, MapPin } from "lucide-react";
 import type { Flow, FlowItem } from "../_contexts/MapEditorContext";
 import type { MockMapPointCommandDto } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../../data/mockCommandDefs";
@@ -25,15 +25,17 @@ interface FlowEditorSidebarProps {
   selectedFlowId: string | null;
   onSelectFlow: (flowId: string | null) => void;
   onAddCommandGroup: () => void;
+  onConvertToDestination: (commandGroupId: string) => void;
 }
 
 interface SortableFlowItemProps {
   flowItem: FlowItem;
   index: number;
   mapPointCommands: MockMapPointCommandDto[];
+  onConvertToDestination?: (commandGroupId: string) => void;
 }
 
-function SortableFlowItem({ flowItem, index, mapPointCommands }: SortableFlowItemProps) {
+function SortableFlowItem({ flowItem, index, mapPointCommands, onConvertToDestination }: SortableFlowItemProps) {
   const itemId = flowItem.type === 'destination'
     ? flowItem.destination.id
     : flowItem.commandGroup.id;
@@ -184,6 +186,15 @@ function SortableFlowItem({ flowItem, index, mapPointCommands }: SortableFlowIte
                     </div>
                   </div>
                 ))}
+                {onConvertToDestination && (
+                  <button
+                    onClick={() => onConvertToDestination(group.id)}
+                    className="w-full mt-2 border border-purple-300 rounded-lg p-3 text-center transition-colors hover:bg-purple-100 text-sm text-purple-700 font-medium flex items-center justify-center gap-2"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    地点として登録
+                  </button>
+                )}
               </div>
             )}
           </AccordionContent>
@@ -220,6 +231,7 @@ export function FlowEditorSidebar({
   selectedFlowId,
   onSelectFlow,
   onAddCommandGroup,
+  onConvertToDestination,
 }: FlowEditorSidebarProps) {
   const selectedFlow = flows.find((f) => f.id === selectedFlowId);
 
@@ -295,6 +307,7 @@ export function FlowEditorSidebar({
                         flowItem={item}
                         index={index}
                         mapPointCommands={mapPointCommands}
+                        onConvertToDestination={onConvertToDestination}
                       />
                     ))}
                   </Accordion>
