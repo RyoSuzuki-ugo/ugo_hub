@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/compon
 import { ArrowLeft } from "lucide-react";
 import { BuildingFloorTab } from "./_components/building-floor-tab.component";
 import { BuildingFloorProvider } from "./_contexts/BuildingFloorContext";
-import { FlowTab } from "./_components/FlowTab";
 import { RobotTab } from "./_components/RobotTab";
 
 export function PlanningPage() {
@@ -24,27 +23,22 @@ export function PlanningPage() {
       </div>
 
       <div className="p-6">
-        <Tabs defaultValue="flow" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
-            <TabsTrigger value="flow">業務（Flow）</TabsTrigger>
+        <Tabs defaultValue="building" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="building">業務（フロア別）</TabsTrigger>
             <TabsTrigger value="robot">ロボット</TabsTrigger>
-            <TabsTrigger value="building">ビル・フロア</TabsTrigger>
             <TabsTrigger value="schedule">スケジュール</TabsTrigger>
             <TabsTrigger value="settings">設定</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="flow">
-            <FlowTab />
-          </TabsContent>
-
-          <TabsContent value="robot">
-            <RobotTab />
-          </TabsContent>
 
           <TabsContent value="building">
             <BuildingFloorProvider>
               <BuildingFloorTab />
             </BuildingFloorProvider>
+          </TabsContent>
+
+          <TabsContent value="robot">
+            <RobotTab />
           </TabsContent>
 
           <TabsContent value="schedule">

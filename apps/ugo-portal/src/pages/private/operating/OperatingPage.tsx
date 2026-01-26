@@ -9,6 +9,7 @@ import { RobotCard } from "../../../features/robot-card";
 import { mockRobotsData } from "../../../data/mockRobots";
 import { useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
+import { FlowTab } from "../planning/_components/FlowTab";
 
 // Mock robot positions for map (4 robots on the map, scattered from center 10,10)
 const mockRobots: Array<RobotPosition & { id: string; name: string; serialNo: string }> = [
@@ -68,15 +69,18 @@ export function OperatingPage() {
           </Button>
         </div>
 
-      <Tabs defaultValue="robot" className="w-full">
-        <TabsList className="grid w-full grid-cols-6 mb-6">
+      <Tabs defaultValue="flow" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsTrigger value="flow">業務（Flow）</TabsTrigger>
           <TabsTrigger value="robot">ロボット</TabsTrigger>
           <TabsTrigger value="sensor">センサーマップ</TabsTrigger>
-          <TabsTrigger value="activity">アクティビティレポート</TabsTrigger>
-          <TabsTrigger value="business">業務レポート</TabsTrigger>
-          <TabsTrigger value="recordings">録画データ</TabsTrigger>
-          <TabsTrigger value="conversations">会話履歴</TabsTrigger>
+          <TabsTrigger value="reports">レポート</TabsTrigger>
         </TabsList>
+
+        {/* Tab 0: Flow */}
+        <TabsContent value="flow">
+          <FlowTab />
+        </TabsContent>
 
         {/* Tab 1: Robot */}
         <TabsContent value="robot">
@@ -235,56 +239,49 @@ export function OperatingPage() {
           </div>
         </TabsContent>
 
-        {/* Tab 3: Activity Report */}
-        <TabsContent value="activity">
-          <Card>
-            <CardHeader>
-              <CardTitle>アクティビティレポート</CardTitle>
-              <CardDescription>ロボットの活動ログを確認</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">準備中</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* Tab 3: Reports */}
+        <TabsContent value="reports">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>アクティビティレポート</CardTitle>
+                <CardDescription>ロボットの活動ログを確認</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">準備中</p>
+              </CardContent>
+            </Card>
 
-        {/* Tab 4: Business Report */}
-        <TabsContent value="business">
-          <Card>
-            <CardHeader>
-              <CardTitle>業務レポート</CardTitle>
-              <CardDescription>警備巡回と点検結果を確認</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">準備中</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            <Card>
+              <CardHeader>
+                <CardTitle>業務レポート</CardTitle>
+                <CardDescription>警備巡回と点検結果を確認</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">準備中</p>
+              </CardContent>
+            </Card>
 
-        {/* Tab 5: Recordings */}
-        <TabsContent value="recordings">
-          <Card>
-            <CardHeader>
-              <CardTitle>録画データ</CardTitle>
-              <CardDescription>ロボットの録画映像を管理</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">準備中</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            <Card>
+              <CardHeader>
+                <CardTitle>録画データ</CardTitle>
+                <CardDescription>ロボットの録画映像を管理</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">準備中</p>
+              </CardContent>
+            </Card>
 
-        {/* Tab 6: Conversations */}
-        <TabsContent value="conversations">
-          <Card>
-            <CardHeader>
-              <CardTitle>会話履歴</CardTitle>
-              <CardDescription>AI自動会話の履歴を確認</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">準備中</p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>会話履歴</CardTitle>
+                <CardDescription>AI自動会話の履歴を確認</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">準備中</p>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
       </div>

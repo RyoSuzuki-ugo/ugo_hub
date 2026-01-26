@@ -25,8 +25,8 @@ export interface FlowCommandGroup {
 }
 
 export type FlowItem =
-  | { type: 'destination'; destination: Destination }
-  | { type: 'commandGroup'; commandGroup: FlowCommandGroup };
+  | { id: string; type: 'destination'; destination: Destination }
+  | { id: string; type: 'commandGroup'; commandGroup: FlowCommandGroup };
 
 export interface Flow {
   id: string;

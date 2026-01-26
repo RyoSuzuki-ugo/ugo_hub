@@ -44,10 +44,7 @@ interface SortableFlowItemProps {
 }
 
 function SortableFlowItem({ flowItem, index, mapPointCommands, onConvertToDestination }: SortableFlowItemProps) {
-  const itemId = flowItem.type === 'destination'
-    ? flowItem.destination.id
-    : flowItem.commandGroup.id;
-
+  // FlowItem.idを使用して一意性を確保
   const {
     attributes,
     listeners,
@@ -55,13 +52,16 @@ function SortableFlowItem({ flowItem, index, mapPointCommands, onConvertToDestin
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: itemId });
+  } = useSortable({ id: flowItem.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  // AccordionItemのvalue用のID（Accordionでは一意である必要がある）
+  const itemId = flowItem.id;
 
   if (flowItem.type === 'destination') {
     const dest = flowItem.destination;
@@ -246,9 +246,8 @@ export function FlowEditorSidebar({
 
   const itemIds = useMemo(() => {
     if (!selectedFlow) return [];
-    return selectedFlow.items.map(item =>
-      item.type === 'destination' ? item.destination.id : item.commandGroup.id
-    );
+    // FlowItem.idを使用して一意性を確保
+    return selectedFlow.items.map(item => item.id);
   }, [selectedFlow]);
 
   const destinationCount = useMemo(() => {
@@ -338,7 +337,7 @@ export function FlowEditorSidebar({
                   <Accordion type="multiple" className="w-full">
                     {selectedFlow.items.map((item, index) => (
                       <SortableFlowItem
-                        key={item.type === 'destination' ? item.destination.id : item.commandGroup.id}
+                        key={item.id}
                         flowItem={item}
                         index={index}
                         mapPointCommands={mapPointCommands}

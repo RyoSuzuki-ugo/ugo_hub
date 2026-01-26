@@ -251,9 +251,15 @@ function MapEditorContent() {
       commands: commandIds,
     };
 
+    const newFlowItem = {
+      id: `flow-item-${Date.now()}-${Math.random()}`,
+      type: 'commandGroup' as const,
+      commandGroup: newGroup
+    };
+
     setFlows(flows.map(flow =>
       flow.id === selectedFlowId
-        ? { ...flow, items: [...flow.items, { type: 'commandGroup', commandGroup: newGroup }] }
+        ? { ...flow, items: [...flow.items, newFlowItem] }
         : flow
     ));
   };
@@ -345,7 +351,7 @@ function MapEditorContent() {
             ...flow,
             items: flow.items.map(item =>
               item.type === 'commandGroup' && item.commandGroup.id === convertCommandGroupId
-                ? { type: 'destination', destination: newDestination }
+                ? { id: item.id, type: 'destination', destination: newDestination }
                 : item
             ),
           }
@@ -388,34 +394,30 @@ function MapEditorContent() {
         const targetFlow = flows.find(f => f.id === flowId);
 
         if (targetFlow) {
-          // 既に追加されていないかチェック
-          const alreadyExists = targetFlow.items.some(
-            item => item.type === 'destination' && item.destination.id === destination.id
-          );
-
-          if (!alreadyExists) {
-            setFlows(flows.map(flow =>
-              flow.id === flowId
-                ? { ...flow, items: [...flow.items, { type: 'destination', destination }] }
-                : flow
-            ));
-          }
+          // 同じ地点を複数回追加できるように、各FlowItemに一意のIDを付与
+          const newFlowItem = {
+            id: `flow-item-${Date.now()}-${Math.random()}`,
+            type: 'destination' as const,
+            destination
+          };
+          setFlows(flows.map(flow =>
+            flow.id === flowId
+              ? { ...flow, items: [...flow.items, newFlowItem] }
+              : flow
+          ));
         }
       }
+      return;
     }
+
     // フロー内でのアイテムの並び替え（地点とコマンドグループの混在）
-    else if (selectedFlowId && active.id !== over.id) {
+    if (selectedFlowId && active.id !== over.id) {
       const selectedFlow = flows.find(f => f.id === selectedFlowId);
 
       if (selectedFlow) {
-        const oldIndex = selectedFlow.items.findIndex(item =>
-          (item.type === 'destination' && item.destination.id === active.id) ||
-          (item.type === 'commandGroup' && item.commandGroup.id === active.id)
-        );
-        const newIndex = selectedFlow.items.findIndex(item =>
-          (item.type === 'destination' && item.destination.id === over.id) ||
-          (item.type === 'commandGroup' && item.commandGroup.id === over.id)
-        );
+        // FlowItem.idを使って検索
+        const oldIndex = selectedFlow.items.findIndex(item => item.id === active.id);
+        const newIndex = selectedFlow.items.findIndex(item => item.id === over.id);
 
         if (oldIndex !== -1 && newIndex !== -1) {
           const newItems = [...selectedFlow.items];
