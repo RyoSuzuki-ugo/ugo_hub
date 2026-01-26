@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@repo/shared-ui/components/dialog";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useState } from "react";
@@ -48,6 +49,7 @@ function MapEditorContent() {
     y: number;
     r: number;
   } | null>(null);
+  const [newMapDialogOpen, setNewMapDialogOpen] = useState(false);
   const {
     mapImageUrl,
     showRobot,
@@ -197,12 +199,20 @@ function MapEditorContent() {
             {loading ? "読み込み中..." : floor ? `${floor.name} - ${isFlowEditorMode ? "フローの確認と編集を行います" : "フロアマップの作成と編集を行います"}` : isFlowEditorMode ? "フローの確認と編集を行います" : "フロアマップの作成と編集を行います"}
           </p>
         </div>
-        <Button
-          variant={isFlowEditorMode ? "default" : "outline"}
-          onClick={() => setIsFlowEditorMode(!isFlowEditorMode)}
-        >
-          {isFlowEditorMode ? "マップエディタに戻る" : "フローエディタを開く"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setNewMapDialogOpen(true)}
+          >
+            新規作成
+          </Button>
+          <Button
+            variant={isFlowEditorMode ? "default" : "outline"}
+            onClick={() => setIsFlowEditorMode(!isFlowEditorMode)}
+          >
+            {isFlowEditorMode ? "マップエディタに戻る" : "フローエディタを開く"}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -333,6 +343,86 @@ function MapEditorContent() {
         destinationName={pendingDestination?.name}
         showSkipButton={!isAddingToExistingDest}
       />
+
+      {/* 新規マップ作成ダイアログ */}
+      <Dialog open={newMapDialogOpen} onOpenChange={setNewMapDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>新規マップ作成</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              マップの作成方法を選択してください
+            </p>
+            <div className="grid gap-3">
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => {
+                  setNewMapDialogOpen(false);
+                  // TODO: マップアップロード処理
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" x2="12" y1="3" y2="15" />
+                </svg>
+                <div>
+                  <div className="font-semibold">マップをアップロード</div>
+                  <div className="text-xs text-muted-foreground">
+                    既存の画像ファイルから作成
+                  </div>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => {
+                  setNewMapDialogOpen(false);
+                  // TODO: マップ作成処理
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 5v14" />
+                  <path d="M5 12h14" />
+                </svg>
+                <div>
+                  <div className="font-semibold">マップを作成</div>
+                  <div className="text-xs text-muted-foreground">
+                    新しいマップを作成
+                  </div>
+                </div>
+              </Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewMapDialogOpen(false)}>
+              キャンセル
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
