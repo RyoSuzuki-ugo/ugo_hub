@@ -34,6 +34,7 @@ import { DestinationNameDialog } from "./_components/DestinationNameDialog";
 import { FlowNameDialog } from "./_components/FlowNameDialog";
 import type { CommandDef } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../data/mockCommandDefs";
+import { mockDestinations, mockFlows, mockMapPointCommandsData } from "../../../../data/mockMapData";
 import { useMemo } from "react";
 
 function MapEditorContent() {
@@ -214,6 +215,14 @@ function MapEditorContent() {
     setSelectedFlowId(newFlow.id);
   };
 
+  // モックデータ注入
+  const handleInjectMockData = () => {
+    setDestinations(mockDestinations);
+    setFlows(mockFlows);
+    setMapPointCommands(mockMapPointCommandsData);
+    setSelectedFlowId(null);
+  };
+
   // ドラッグ&ドロップのセンサー設定
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -385,6 +394,12 @@ function MapEditorContent() {
               {loading ? "読み込み中..." : floor ? floor.name : ""}
             </h1>
           </div>
+          <Button
+            variant="outline"
+            onClick={handleInjectMockData}
+          >
+            モックデータ注入
+          </Button>
         </div>
 
         <div className="flex flex-1 overflow-hidden relative">
@@ -589,7 +604,7 @@ function MapEditorContent() {
                     className="h-6 w-6 p-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: フロー編集処理
+                      setSelectedFlowId(null);
                     }}
                   >
                     <Edit className="h-4 w-4" />
