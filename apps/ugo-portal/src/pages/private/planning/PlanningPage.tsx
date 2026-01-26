@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { BuildingFloorTab } from "./_components/building-floor-tab.component";
 import { BuildingFloorProvider } from "./_contexts/BuildingFloorContext";
 import { FlowTab } from "./_components/FlowTab";
+import { RobotTab } from "./_components/RobotTab";
 
 export function PlanningPage() {
   const navigate = useNavigate();
@@ -37,9 +38,7 @@ export function PlanningPage() {
           </TabsContent>
 
           <TabsContent value="robot">
-            <div className="text-center py-20 text-gray-500">
-              ロボットのコンテンツ
-            </div>
+            <RobotTab />
           </TabsContent>
 
           <TabsContent value="building">
