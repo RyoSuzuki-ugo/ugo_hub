@@ -83,7 +83,7 @@ export function TaskCard({ task }: TaskCardProps) {
                 variant="default"
                 className="flex-1 bg-black hover:bg-gray-800"
                 onClick={() => {
-                  // TODO: 業務を監視
+                  window.open('/operating/teleope', '_blank');
                 }}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
@@ -112,7 +112,7 @@ export function TaskCard({ task }: TaskCardProps) {
                 variant="default"
                 className="flex-1 bg-black hover:bg-gray-800"
                 onClick={() => {
-                  // TODO: 業務を監視・操作
+                  window.open('/operating/teleope', '_blank');
                 }}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />

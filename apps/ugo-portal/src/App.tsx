@@ -32,7 +32,6 @@ function App() {
         <Route path="/system-settings" element={<SystemSettingsPage />} />
         <Route path="/setup/initial" element={<InitialSetupPage />} />
         <Route path="/flow" element={<FlowPage />} />
-        <Route path="/teleope" element={<TeleopePage />} />
       </Route>
 
       {/* Private routes without sidebar (full screen) */}
@@ -40,6 +39,7 @@ function App() {
         <Route path="/map-editor" element={<MapEditorPage />} />
         <Route path="/map-editor/:floorId" element={<MapEditorPage />} />
         <Route path="/monitoring" element={<MonitoringPage />} />
+        <Route path="/operating/teleope" element={<TeleopePage />} />
       </Route>
     </Routes>
   );

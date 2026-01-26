@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@repo/shared-ui/compon
 import { Button } from "@repo/shared-ui/components/button";
 import { Progress } from "@repo/shared-ui/components/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@repo/shared-ui/components/dialog";
-import { Activity, Wifi, MapPin, Battery, Clock } from "lucide-react";
+import { Activity, Wifi, MapPin, Battery, Clock, ExternalLink } from "lucide-react";
 import { useWebSocketImageStream } from "@repo/websocket-client";
 import type { RobotData } from "./types";
 
@@ -123,15 +123,15 @@ export function RobotCard({ robot, onOperateClick }: RobotCardProps) {
 
         {/* Action Button */}
         <Button
-          variant="outline"
-          size="sm"
-          className="w-full mt-2"
+          variant="default"
+          className="w-full mt-2 bg-black hover:bg-gray-800"
           onClick={(e) => {
             e.stopPropagation();
-            onOperateClick?.(robot.serialNo);
+            window.open('/operating/teleope', '_blank');
           }}
         >
-          操作画面を開く
+          <ExternalLink className="h-4 w-4 mr-2" />
+          業務を監視
         </Button>
       </CardContent>
     </Card>
