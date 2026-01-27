@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@repo/shared-ui/components/button";
-import { ArrowLeft, MoreVertical, Minimize2, Maximize2, Plus, Edit, GripVertical, Link, Users } from "lucide-react";
+import { ArrowLeft, MoreVertical, Minimize2, Maximize2, Plus, Edit, GripVertical, Link, Users, Eye, EyeOff } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,6 +74,7 @@ function MapEditorContent() {
   const [isDraggingRobotControl, setIsDraggingRobotControl] = useState(false);
   const [robotControlDragOffset, setRobotControlDragOffset] = useState({ x: 0, y: 0 });
   const [isRobotControlMinimized, setIsRobotControlMinimized] = useState(false);
+  const [showAllDestinations, setShowAllDestinations] = useState(true);
   const {
     mapImageUrl,
     showRobot,
@@ -119,6 +120,34 @@ function MapEditorContent() {
   const selectedDestination = destinations.find(
     (d) => d.id === selectedDestinationId
   );
+
+  // 選択中のフローに所属する地点のみをフィルタリング
+  const visibleDestinations = useMemo(() => {
+    // 全ての地点を表示モードの場合
+    if (showAllDestinations) {
+      return destinations;
+    }
+
+    // フローが選択されていない場合は全ての地点を表示
+    if (!selectedFlowId) {
+      return destinations;
+    }
+
+    const selectedFlow = flows.find(f => f.id === selectedFlowId);
+    if (!selectedFlow) {
+      return destinations;
+    }
+
+    // フロー内の地点IDを抽出（重複を除外）
+    const flowDestinationIds = new Set(
+      selectedFlow.items
+        .filter(item => item.type === 'destination')
+        .map(item => item.destination.id)
+    );
+
+    // フローに含まれる地点のみをフィルタリング
+    return destinations.filter(dest => flowDestinationIds.has(dest.id));
+  }, [showAllDestinations, selectedFlowId, flows, destinations]);
 
   // 地点（目的地）を追加
   const handleAddDestination = () => {
@@ -662,7 +691,7 @@ function MapEditorContent() {
               )}
 
               {/* 地点（目的地）マーカー */}
-              {destinations.map((dest) => (
+              {visibleDestinations.map((dest) => (
                 <DestinationMarker
                   key={dest.id}
                   x={dest.x}
@@ -827,6 +856,22 @@ function MapEditorContent() {
             <div className="flex items-center gap-1">
               {!isFlowSidebarMinimized && (
                 <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAllDestinations(!showAllDestinations);
+                    }}
+                    title={showAllDestinations ? "フローの地点のみ表示" : "全ての地点を表示"}
+                  >
+                    {showAllDestinations ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
