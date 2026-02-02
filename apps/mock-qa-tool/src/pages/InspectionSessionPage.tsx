@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@repo/shared-ui/components/dialog';
-import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Save, X, FileCheck } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Save, X, FileCheck, Upload, Paperclip, Trash2 } from 'lucide-react';
 import { RobotControlCard } from '@repo/feature';
 import { inspectionItems, categories } from '../data/inspectionItems';
 import type { InspectionItem } from '../data/inspectionItems';
@@ -29,6 +29,8 @@ export function InspectionSessionPage() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<Record<string, File[]>>({});
+  const [notes, setNotes] = useState<Record<string, string>>({});
 
   const currentItem = inspectionItems[currentIndex];
   const totalItems = inspectionItems.length;
@@ -59,6 +61,31 @@ export function InspectionSessionPage() {
 
   const handleJumpToItem = (index: number) => {
     setCurrentIndex(index);
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const newFiles = Array.from(files);
+    setAttachedFiles((prev) => ({
+      ...prev,
+      [currentItem.id]: [...(prev[currentItem.id] || []), ...newFiles],
+    }));
+  };
+
+  const handleRemoveFile = (fileIndex: number) => {
+    setAttachedFiles((prev) => ({
+      ...prev,
+      [currentItem.id]: (prev[currentItem.id] || []).filter((_, index) => index !== fileIndex),
+    }));
+  };
+
+  const handleNotesChange = (value: string) => {
+    setNotes((prev) => ({
+      ...prev,
+      [currentItem.id]: value,
+    }));
   };
 
   const handleSave = () => {
@@ -111,10 +138,10 @@ export function InspectionSessionPage() {
   const serialNo = "UM01AA-A294X0006";
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="h-screen bg-background flex overflow-hidden">
       {/* サイドバー: 検査項目一覧 */}
-      <div className="w-80 border-r bg-muted/10">
-        <div className="p-4 border-b">
+      <div className="w-80 border-r bg-muted/10 flex flex-col">
+        <div className="p-4 border-b flex-shrink-0">
           <h2 className="font-semibold text-lg">検査項目一覧</h2>
           <div className="mt-2 space-y-1">
             <div className="text-sm text-muted-foreground">
@@ -124,7 +151,7 @@ export function InspectionSessionPage() {
           </div>
         </div>
 
-        <div className="h-[calc(100vh-120px)] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto">
           <div className="p-2 space-y-1">
             {categories.map((category) => {
               const categoryItems = inspectionItems.filter(
@@ -172,7 +199,7 @@ export function InspectionSessionPage() {
       {/* メインエリア: 現在の検査項目 */}
       <div className="flex-1 flex flex-col">
         {/* ヘッダー */}
-        <div className="border-b p-4 bg-background">
+        <div className="border-b p-4 bg-background flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
               <div className="text-sm text-muted-foreground">
@@ -202,9 +229,9 @@ export function InspectionSessionPage() {
           </div>
         </div>
 
-        {/* コンテンツ */}
+        {/* コンテンツ（スクロール可能） */}
         <div className="flex-1 overflow-y-auto">
-          <div className={`p-6 mx-auto space-y-6 ${shouldShowRobotControl ? 'grid grid-cols-2 gap-6' : 'max-w-4xl'}`}>
+          <div className={`p-6 mx-auto h-full ${shouldShowRobotControl ? 'grid grid-cols-2 gap-6 items-start' : 'max-w-4xl'}`}>
             <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -251,6 +278,88 @@ export function InspectionSessionPage() {
               </CardContent>
             </Card>
 
+            {/* メモ・備考欄 */}
+            <Card>
+              <CardHeader>
+                <CardTitle>メモ・備考</CardTitle>
+                <CardDescription>検査時の気づきや特記事項を記録できます</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <textarea
+                  className="w-full min-h-[100px] p-3 border rounded-md resize-y"
+                  placeholder="メモを入力してください..."
+                  value={notes[currentItem.id] || ''}
+                  onChange={(e) => handleNotesChange(e.target.value)}
+                />
+              </CardContent>
+            </Card>
+
+            {/* ファイル添付 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Paperclip className="h-5 w-5" />
+                  ファイル添付
+                </CardTitle>
+                <CardDescription>
+                  画像やドキュメントを添付できます（複数選択可）
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <input
+                    type="file"
+                    id={`file-upload-${currentItem.id}`}
+                    multiple
+                    accept="image/*,.pdf,.doc,.docx"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => document.getElementById(`file-upload-${currentItem.id}`)?.click()}
+                    className="w-full"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    ファイルを選択
+                  </Button>
+                </div>
+
+                {attachedFiles[currentItem.id] && attachedFiles[currentItem.id].length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">
+                      添付ファイル ({attachedFiles[currentItem.id].length})
+                    </div>
+                    <div className="space-y-2">
+                      {attachedFiles[currentItem.id].map((file, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 border rounded-md bg-muted/50"
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <Paperclip className="h-4 w-4 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium truncate">{file.name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {(file.size / 1024).toFixed(2)} KB
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveFile(index)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {allCompleted && (
               <Card className="border-green-200 bg-green-50">
                 <CardHeader>
@@ -283,8 +392,8 @@ export function InspectionSessionPage() {
           </div>
         </div>
 
-        {/* フッター: アクションボタン */}
-        <div className="border-t p-4 bg-background">
+        {/* フッター: アクションボタン（固定） */}
+        <div className="border-t p-4 bg-background shadow-lg flex-shrink-0">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             <Button
               variant="outline"
