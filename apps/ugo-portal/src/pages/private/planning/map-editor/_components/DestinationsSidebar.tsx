@@ -117,7 +117,7 @@ export function DestinationsSidebar({
     <div className="flex-1 border-b overflow-y-auto">
       <div className="p-4 border-b bg-muted/30">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">地点（目的地）</h3>
+          <h3 className="font-semibold">タスク（地点＋コマンド）</h3>
           <Button variant="outline" size="sm" onClick={onAddDestination}>
             + 追加
           </Button>
