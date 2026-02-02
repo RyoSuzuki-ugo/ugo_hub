@@ -1,4 +1,4 @@
-import { RobotControlCard } from "../../../features/robot-control-card";
+import { RobotControlCard } from "@repo/feature";
 
 export function RobotControlPage() {
   const handleMoveForward = () => {

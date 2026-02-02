@@ -1,4 +1,4 @@
-import type { RobotData } from "../features/robot-card";
+import type { RobotData } from "@repo/feature";
 
 export interface RobotDataWithId extends RobotData {
   id: string;

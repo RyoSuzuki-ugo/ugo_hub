@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/compon
 import { ArrowLeft, Maximize2 } from "lucide-react";
 import { MultiRobotMapViewer, SensorMarker, FloorMapPlane, MapControls, MapCamera, MapLighting } from "@repo/feature";
 import type { RobotPosition } from "@repo/feature";
-import { RobotCard } from "../../../features/robot-card";
+import { RobotCard } from "@repo/feature";
 import { mockRobotsData } from "../../../data/mockRobots";
 import { useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";

@@ -34,7 +34,7 @@ import { DestinationNameDialog } from "./_components/DestinationNameDialog";
 import { FlowNameDialog } from "./_components/FlowNameDialog";
 import { CommandGroupDialog } from "./_components/CommandGroupDialog";
 import { DestinationWithPositionDialog } from "./_components/DestinationWithPositionDialog";
-import { RobotControlCard } from "../../../../features/robot-control-card";
+import { RobotControlCard } from "@repo/feature";
 import type { CommandDef } from "@repo/api-client";
 import { mockCommandDefs } from "../../../../data/mockCommandDefs";
 import { mockDestinations, mockFlows, mockMapPointCommandsData } from "../../../../data/mockMapData";
