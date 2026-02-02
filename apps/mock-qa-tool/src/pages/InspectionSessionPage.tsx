@@ -3,7 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo
 import { Button } from '@repo/shared-ui/components/button';
 import { Progress } from '@repo/shared-ui/components/progress';
 import { Badge } from '@repo/shared-ui/components/badge';
-import { CheckCircle2, Circle, ChevronRight, ChevronLeft } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@repo/shared-ui/components/dialog';
+import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Save, X, FileCheck } from 'lucide-react';
 import { RobotControlCard } from '@repo/feature';
 import { inspectionItems, categories } from '../data/inspectionItems';
 import type { InspectionItem } from '../data/inspectionItems';
@@ -18,6 +26,9 @@ export function InspectionSessionPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
   const [sessionStartTime] = useState(new Date().toISOString());
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [showCompleteDialog, setShowCompleteDialog] = useState(false);
 
   const currentItem = inspectionItems[currentIndex];
   const totalItems = inspectionItems.length;
@@ -50,11 +61,48 @@ export function InspectionSessionPage() {
     setCurrentIndex(index);
   };
 
+  const handleSave = () => {
+    // TODO: 検査データをlocalStorageまたはAPIに保存
+    const sessionData = {
+      sessionStartTime,
+      completedItems: Array.from(completedItems),
+      currentIndex,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem('inspection-session', JSON.stringify(sessionData));
+    setShowSaveDialog(false);
+    alert('検査データを保存しました');
+  };
+
+  const handleExit = () => {
+    window.close();
+  };
+
+  const handleCompleteInspection = () => {
+    // TODO: 検査完了データを保存・送信
+    const sessionData = {
+      sessionStartTime,
+      completedItems: Array.from(completedItems),
+      completedAt: new Date().toISOString(),
+      totalItems,
+      completionRate: (completedItems.size / totalItems) * 100,
+    };
+    localStorage.setItem('inspection-completed', JSON.stringify(sessionData));
+    setShowCompleteDialog(false);
+    alert('検査を完了しました。このページを閉じてください。');
+  };
+
   const isCurrentItemCompleted = completedItems.has(currentItem.id);
   const allCompleted = completedItems.size === totalItems;
 
-  // ポータル、マップエディタなどが含まれる場合はRobotControlCardを表示
+  // ポータル、マップエディタ、遠隔操作などが含まれる場合はRobotControlCardを表示
   const shouldShowRobotControl = useMemo(() => {
+    // カテゴリが「遠隔操作」の場合
+    if (currentItem.category.includes('遠隔操作')) {
+      return true;
+    }
+
+    // その他のキーワードチェック
     const keywords = ['ポータル', 'Portal', 'portal', 'マップエディタ', 'Map', 'ugo Portal'];
     const textToCheck = `${currentItem.item} ${currentItem.procedure} ${currentItem.criteria}`.toLowerCase();
     return keywords.some(keyword => textToCheck.includes(keyword.toLowerCase()));
@@ -125,16 +173,32 @@ export function InspectionSessionPage() {
       <div className="flex-1 flex flex-col">
         {/* ヘッダー */}
         <div className="border-b p-4 bg-background">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1">
               <div className="text-sm text-muted-foreground">
                 検査項目 {currentIndex + 1} / {totalItems}
               </div>
               <h1 className="text-2xl font-bold mt-1">{currentItem.item}</h1>
             </div>
-            <Badge variant={isCurrentItemCompleted ? 'default' : 'outline'}>
-              {isCurrentItemCompleted ? '完了' : '未完了'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowSaveDialog(true)}>
+                <Save className="h-4 w-4 mr-2" />
+                一時保存
+              </Button>
+              {allCompleted && (
+                <Button size="sm" onClick={() => setShowCompleteDialog(true)}>
+                  <FileCheck className="h-4 w-4 mr-2" />
+                  検査完了
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => setShowExitDialog(true)}>
+                <X className="h-4 w-4 mr-2" />
+                終了
+              </Button>
+              <Badge variant={isCurrentItemCompleted ? 'default' : 'outline'}>
+                {isCurrentItemCompleted ? '完了' : '未完了'}
+              </Badge>
+            </div>
           </div>
         </div>
 
@@ -262,6 +326,107 @@ export function InspectionSessionPage() {
           </div>
         </div>
       </div>
+
+      {/* 一時保存ダイアログ */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>検査データを一時保存</DialogTitle>
+            <DialogDescription>
+              現在の検査進捗状況を保存します。後で続きから再開できます。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              完了項目数: {completedItems.size} / {totalItems}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              進捗率: {Math.round((completedItems.size / totalItems) * 100)}%
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+              キャンセル
+            </Button>
+            <Button onClick={handleSave}>
+              <Save className="h-4 w-4 mr-2" />
+              保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 終了確認ダイアログ */}
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>検査を終了しますか？</DialogTitle>
+            <DialogDescription>
+              保存していないデータは失われます。終了する前に一時保存することをお勧めします。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              完了項目数: {completedItems.size} / {totalItems}
+            </p>
+            <p className="text-sm font-medium text-orange-600">
+              {completedItems.size < totalItems && '未完了の項目があります'}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExitDialog(false)}>
+              キャンセル
+            </Button>
+            <Button variant="outline" onClick={() => {
+              setShowExitDialog(false);
+              setShowSaveDialog(true);
+            }}>
+              保存して終了
+            </Button>
+            <Button variant="destructive" onClick={handleExit}>
+              <X className="h-4 w-4 mr-2" />
+              保存せず終了
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 検査完了ダイアログ */}
+      <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>検査を完了しますか？</DialogTitle>
+            <DialogDescription>
+              すべての検査項目が完了しました。検査結果を確定します。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">総検査項目数:</span>
+              <span className="text-sm font-medium">{totalItems}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">完了項目数:</span>
+              <span className="text-sm font-medium">{completedItems.size}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">完了率:</span>
+              <span className="text-sm font-medium text-green-600">
+                {Math.round((completedItems.size / totalItems) * 100)}%
+              </span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCompleteDialog(false)}>
+              キャンセル
+            </Button>
+            <Button onClick={handleCompleteInspection}>
+              <FileCheck className="h-4 w-4 mr-2" />
+              完了
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
