@@ -4,7 +4,7 @@ import { Progress } from "@repo/shared-ui/components/progress";
 import { Button } from "@repo/shared-ui/components/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/shared-ui/components/tabs";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { RobotCard } from "../../../features/robot-card";
+import { RobotCard } from "@repo/feature";
 import { mockRobotsData } from "../../../data/mockRobots";
 
 // Mock data
