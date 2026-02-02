@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/shared-ui/components/card";
 import { Button } from "@repo/shared-ui/components/button";
-import { ExternalLink, Palette, Layout, Wifi } from "lucide-react";
+import { ExternalLink, Palette, Layout, Wifi, TestTube2 } from "lucide-react";
 
 export function HubPage() {
   const handleOpenApp = (url: string) => {
@@ -110,6 +110,39 @@ export function HubPage() {
                 }}
               >
                 テストを開く
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Mock QA Tool Card */}
+          <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => handleOpenApp('http://localhost:4004')}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                    <TestTube2 className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">Mock QA Tool</CardTitle>
+                    <CardDescription className="text-sm mt-1">QAモックツール</CardDescription>
+                  </div>
+                </div>
+                <ExternalLink className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-600 mb-4">
+                QAテスト用のモックデータ生成・管理ツール
+              </p>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenApp('http://localhost:4004');
+                }}
+              >
+                ツールを開く
               </Button>
             </CardContent>
           </Card>

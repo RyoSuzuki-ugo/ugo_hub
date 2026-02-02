@@ -15,7 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@repo/shared-ui/components/sidebar';
-import { LogOut, Settings, Building2, Calendar, Home, MonitorPlay } from 'lucide-react';
+import { LogOut, Settings, Building2, Calendar, Home, MonitorPlay, TestTube2 } from 'lucide-react';
 
 export function PrivateLayout() {
   const { logout, operator } = useAuth();
@@ -28,6 +28,7 @@ export function PrivateLayout() {
     { path: '/planning', label: 'プランニング', description: '業務計画', icon: Calendar },
     { path: '/management', label: 'マネジメント', description: '管理機能', icon: Building2 },
     { path: '/system-settings', label: 'システム設定', description: 'システム管理', icon: Settings },
+    { path: 'http://localhost:4004', label: 'Mock QA Tool', description: 'QAモックツール', icon: TestTube2, external: true },
   ];
 
   const isActive = (path: string) => location.pathname.startsWith(path);
@@ -55,10 +56,17 @@ export function PrivateLayout() {
               <SidebarMenu>
                 {menuItems.map((item) => {
                   const Icon = item.icon;
+                  const handleClick = () => {
+                    if ('external' in item && item.external) {
+                      window.open(item.path, '_blank');
+                    } else {
+                      navigate(item.path);
+                    }
+                  };
                   return (
                     <SidebarMenuItem key={item.path}>
                       <SidebarMenuButton
-                        onClick={() => navigate(item.path)}
+                        onClick={handleClick}
                         className={`group-data-[collapsible=icon]:justify-center ${
                           isActive(item.path)
                             ? 'bg-sidebar-accent text-sidebar-accent-foreground'
