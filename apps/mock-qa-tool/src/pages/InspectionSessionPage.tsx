@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/shared-ui/components/card';
 import { Button } from '@repo/shared-ui/components/button';
 import { Progress } from '@repo/shared-ui/components/progress';
 import { Badge } from '@repo/shared-ui/components/badge';
 import { CheckCircle2, Circle, ChevronRight, ChevronLeft } from 'lucide-react';
+import { RobotControlCard } from '@repo/feature';
 import { inspectionItems, categories } from '../data/inspectionItems';
 import type { InspectionItem } from '../data/inspectionItems';
 
@@ -51,6 +52,15 @@ export function InspectionSessionPage() {
 
   const isCurrentItemCompleted = completedItems.has(currentItem.id);
   const allCompleted = completedItems.size === totalItems;
+
+  // ポータル、マップエディタなどが含まれる場合はRobotControlCardを表示
+  const shouldShowRobotControl = useMemo(() => {
+    const keywords = ['ポータル', 'Portal', 'portal', 'マップエディタ', 'Map', 'ugo Portal'];
+    const textToCheck = `${currentItem.item} ${currentItem.procedure} ${currentItem.criteria}`.toLowerCase();
+    return keywords.some(keyword => textToCheck.includes(keyword.toLowerCase()));
+  }, [currentItem]);
+
+  const serialNo = "UM01AA-A294X0006";
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -130,7 +140,8 @@ export function InspectionSessionPage() {
 
         {/* コンテンツ */}
         <div className="flex-1 overflow-y-auto">
-          <div className="p-6 max-w-4xl mx-auto space-y-6">
+          <div className={`p-6 mx-auto space-y-6 ${shouldShowRobotControl ? 'grid grid-cols-2 gap-6' : 'max-w-4xl'}`}>
+            <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>カテゴリ</CardTitle>
@@ -187,6 +198,23 @@ export function InspectionSessionPage() {
                   </p>
                 </CardContent>
               </Card>
+            )}
+            </div>
+
+            {/* RobotControlCard */}
+            {shouldShowRobotControl && (
+              <div className="space-y-6">
+                <RobotControlCard
+                  serialNo={serialNo}
+                  name="検査用ロボット"
+                  onMoveForward={() => console.log('前進')}
+                  onMoveBackward={() => console.log('後退')}
+                  onMoveLeft={() => console.log('左移動')}
+                  onMoveRight={() => console.log('右移動')}
+                  onRotateLeft={() => console.log('左回転')}
+                  onRotateRight={() => console.log('右回転')}
+                />
+              </div>
             )}
           </div>
         </div>
